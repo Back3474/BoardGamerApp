@@ -29,7 +29,7 @@
     <string name="late_check">confirm</string>
     <string name="next_meeting">next meeting</string>
     <string name="nxt_mtng_date">date</string>
-    <string name="main_mtng_date">--/--/----</string>
+    <string name="main_mtng_day">--/--/----</string>
     <string name="main_mtng_time">--:--</string>
     <string name="nxt_mtng_host">host</string>
     <string name="main_mtng_host">(host)</string>

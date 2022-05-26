@@ -1,20 +1,30 @@
 package com.example.boardgamerapp;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
+import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuItemClickListener {
     private ImageButton menu;
@@ -22,10 +32,13 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
     private Button rating;
     private Button games;
     private FirebaseAuth auth;
+    private FirebaseDatabase db;
     private MenuItem acc;
     private MenuItem logout;
     private MenuItem mngmnt;
     private LinearLayout meeting_layout;
+    private TextView day;
+    private Thread thread;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +48,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         overridePendingTransition(com.google.android.material.R.anim.abc_popup_enter, com.google.android.material.R.anim.abc_popup_exit);
 
         auth = FirebaseAuth.getInstance();
+        db = FirebaseDatabase.getInstance();
         menu = findViewById(R.id.main_menuBtn);
         late = findViewById(R.id.main_lateBtn);
         rating = findViewById(R.id.main_ratingBtn);
@@ -43,6 +57,8 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         mngmnt = findViewById(R.id.menu_mngmnt);
         meeting_layout = findViewById(R.id.main_meetingLayout);
         games = findViewById(R.id.main_gamesBtn);
+        day = findViewById(R.id.main_mtng_day);
+
 
         meeting_layout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -78,6 +94,52 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                 startActivity(new Intent(MainActivity.this, RatingActivity.class));
             }
         });
+
+        /*DatabaseReference ref = db.getReference().child("test");
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                day.setText(snapshot.getValue().toString());
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });*/
+
+        thread = new Thread() {
+
+            @Override
+            public void run() {
+                try {
+                    while (!thread.isInterrupted()) {
+                        Thread.sleep(1000);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                DatabaseReference ref = db.getReference().child("test");
+                                ref.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                        day.setText(snapshot.getValue().toString());
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError error) {
+
+                                    }
+                                });
+                            }
+                        });
+                    }
+                } catch (InterruptedException e) {
+                }
+            }
+        };
+
+        thread.start();
+
     }
 
     public void showPopup(View v) {
@@ -147,4 +209,5 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         dialog.show();
 
     }
+
 }
