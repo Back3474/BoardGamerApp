@@ -1,0 +1,124 @@
+<resources>
+    <string name="app_name">Board Gamer</string>
+    <string name="email_login">email</string>
+    <string name="password_login">password</string>
+    <string name="login_btn">login</string>
+    <string name="register_btn">register</string>
+    <string name="regis_firstname">first name</string>
+    <string name="regis_lastname">last name</string>
+    <string name="regis_email">email</string>
+    <string name="regis_password">password</string>
+    <string name="regis_password_conf">password confirmation</string>
+    <string name="regis_address">address (street &amp; number, code &amp; city)</string>
+    <string name="regis_data">please enter your data:</string>
+    <string name="regis_data_pers">personal data:</string>
+    <string name="regis_data_login">login data:</string>
+    <string name="regis_save_btn">save</string>
+    <string name="back_btn">previous</string>
+    <string name="discard_title">Are you sure?</string>
+    <string name="discard_msg">This will discard all your data entries. Do you want to continue?</string>
+    <string name="discard_yes">Yes</string>
+    <string name="late_quick_msg">quick message:</string>
+    <string name="late_custom_msg">customized message:</string>
+    <string name="late_custom_time">customized time:</string>
+    <string name="fiveMin">five minutes</string>
+    <string name="fifteenMin">fifteen minutes</string>
+    <string name="thirtyMin">thirty minutes</string>
+    <string name="optional">(optional)</string>
+    <string name="custom_lateMins">your late time in minutes</string>
+    <string name="late_check">confirm</string>
+    <string name="next_meeting">next meeting</string>
+    <string name="nxt_mtng_date">date</string>
+    <string name="main_mtng_date">--/--/----</string>
+    <string name="main_mtng_time">--:--</string>
+    <string name="nxt_mtng_host">host</string>
+    <string name="main_mtng_host">(host)</string>
+    <string name="nxt_mtng_address">address</string>
+    <string name="main_mtng_address">(address)</string>
+    <string name="main_logoutBtn">logout</string>
+    <string name="main_menuBtn">menu</string>
+    <string name="main_lateBtn">I´m going to be late!</string>
+    <string name="main_ratingBtn">rate last gamenight</string>
+    <string name="meal_rate">how would you rate the meal?</string>
+    <string name="gameNight_rate">how would you rate the gamenight overall?</string>
+    <string name="main_cannotTakePart">I cannot take part!</string>
+    <string name="main_games">games for next gamenight</string>
+    <string name="rate_msg">do you want to tell something to the host?</string>
+    <string name="rate_send">send message</string>
+    <string name="myAccountData">my account</string>
+    <string name="accountData_name">name</string>
+    <string name="accountData_email">email</string>
+    <string name="accountData_address">address</string>
+    <string name="updateAccDataBtn">update your data</string>
+    <string name="changePassBtn">change your password</string>
+    <string name="accDatatUpdate">update your data</string>
+    <string name="updateName">update name</string>
+    <string name="updateEmail">update email</string>
+    <string name="updateAddress">update address</string>
+    <string name="saveUpdatedData">save changes</string>
+    <string name="changePassword">change your password</string>
+    <string name="saveChangedPass">save</string>
+    <string name="label_currentPass">current password</string>
+    <string name="label_newPass">new password</string>
+    <string name="label_confirmNewPass">confirm new password</string>
+    <string name="menu_acc">my account</string>
+    <string name="menu_logout">logout</string>
+    <string name="menu_mngmnt">management (only for admins)</string>
+    <string name="mngmnt_label">management</string>
+    <string name="mngmnt_user">user management</string>
+    <string name="mngmnt_chooseUser">user</string>
+    <string name="mngmnt_chooseDay">choose day</string>
+    <string name="mngmnt_chooseTime">choose time</string>
+    <string name="mngmnt_adminStatus">give admin status</string>
+    <string name="mngmnt_deleteUser">delete user</string>
+    <string name="mngmnt_current_regular_appointment">current default regular appointment</string>
+    <string name="mngmnt_default_regular_appointment">change default regular appointment</string>
+    <string name="mngmnt_default_regular_appointment_confirm">confrim changed default regular appointment</string>
+    <string name="mngmnt_selectTime">select time</string>
+    <string name="mngmnt_day">day</string>
+    <string name="mngmnt_time">time</string>
+    <string name="leave_app">Do you want to leave Board Gamer?</string>
+    <string name="meeting_label_meeting">next meeting</string>
+    <string name="label_meeting_nxt_mtng_date">date</string>
+    <string name="meeting_nxt_mtng_day">day</string>
+    <string name="meeting_nxt_mtng_time">time</string>
+    <string name="label_meeting_nxt_mtng_host">host</string>
+    <string name="label_meeting_nxt_mtng_address">address</string>
+    <string name="meeting_edit_mtng_btn">edit meeting</string>
+    <string name="meeting_cancel_mtng_btn">cancel meeting</string>
+    <string name="meeting_confirm_mtng_end_btn">confirm meeting end</string>
+    <string name="games_vote_game_btn">vote game</string>
+    <string name="games_sug_games">suggested games for next gamenight</string>
+    <string name="games_sug_game">suggest game</string>
+    <string name="games_my_sug_game">my suggested game</string>
+    <string name="logout_msg">Do you want to logout?</string>
+
+
+    <string name="mon">Monday</string>
+    <string name="tue">Tuesday</string>
+    <string name="wed">Wednesday</string>
+    <string name="thu">Thursday</string>
+    <string name="fri">Friday</string>
+    <string name="sat">Saturday</string>
+    <string name="sun">Sunday</string>
+
+    <string-array name="days_array">
+        <item>@string/mon</item>
+        <item>@string/tue</item>
+        <item>@string/wed</item>
+        <item>@string/thu</item>
+        <item>@string/fri</item>
+        <item>@string/sat</item>
+        <item>@string/sun</item>
+    </string-array>
+
+    <string-array name="games_array">
+        <item>"Monopoly"</item>
+        <item>"Mensch ärgere dich nicht"</item>
+        <item>"Häschen in der Grube"</item>
+        <item>"test"</item>
+        <item>"test1"</item>
+        <item>"test2"</item>
+        <item>"test3</item>
+    </string-array>
+</resources>
