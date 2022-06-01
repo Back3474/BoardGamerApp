@@ -12,13 +12,21 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class LoginActivity extends AppCompatActivity {
     private EditText email;
@@ -26,6 +34,10 @@ public class LoginActivity extends AppCompatActivity {
     private ImageButton login_btn;
     private ImageButton regis_btn;
     private FirebaseAuth auth;
+    private FirebaseDatabase db;
+    private TextView resetPass;
+    String statusLogin;
+    String statusAutoLogin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +51,38 @@ public class LoginActivity extends AppCompatActivity {
         login_btn = findViewById(R.id.login_loginBtn);
         regis_btn = findViewById(R.id.login_regisBtn);
         auth = FirebaseAuth.getInstance();
+        db = FirebaseDatabase.getInstance();
+        resetPass = findViewById(R.id.resetPass);
+
+        if (auth.getCurrentUser() != null) {
+
+        }
+
+
+        resetPass.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
+                builder.setCancelable(true);
+                builder.setTitle(R.string.reset_pass_msg);
+                builder.setPositiveButton(R.string.discard_yes,
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                startActivity(new Intent(LoginActivity.this, ResetPassword.class));
+                                finish();
+                            }
+                        });
+                builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                });
+
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            }
+        });
 
         login_btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -54,6 +98,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(LoginActivity.this, RegistrationActivity.class));
+                finish();
             }
         });
 
@@ -72,20 +117,34 @@ public class LoginActivity extends AppCompatActivity {
 
     private void loginUser(String email, String password) {
         if(email.isEmpty() || password.isEmpty()){
-            Toast.makeText(LoginActivity.this, "please enter login data", Toast.LENGTH_SHORT).show();
+            Toast.makeText(LoginActivity.this, R.string.enter_login_data, Toast.LENGTH_SHORT).show();
         } else {
 
-        auth.signInWithEmailAndPassword(email, password).addOnSuccessListener(new OnSuccessListener<AuthResult>() {
+        auth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
-            public void onSuccess(AuthResult authResult) {
-                Toast.makeText(LoginActivity.this, "login successfull!", Toast.LENGTH_SHORT).show();
-                startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                finish();
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Toast.makeText(LoginActivity.this, "wrong email or password", Toast.LENGTH_SHORT).show();
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if (task.isSuccessful()){
+                    DatabaseReference ref = db.getReference("users/" + auth.getUid().toString());
+                    ref.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            statusLogin = snapshot.child("status").getValue().toString();
+                            if (statusLogin.equals("deactivated")) {
+                                auth.signOut();
+                                Toast.makeText(LoginActivity.this, R.string.acc_deactivated, Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(LoginActivity.this, R.string.login_success, Toast.LENGTH_SHORT).show();
+                                startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                                finish();
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
+                        }
+                    });
+                }
             }
         });
     }
@@ -95,10 +154,30 @@ public class LoginActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (auth.getCurrentUser() != null) {
+            findViewById(R.id.loginLayout).setVisibility(View.GONE);
+            DatabaseReference ref = db.getReference("users/" + auth.getUid().toString());
+            ref.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    statusAutoLogin = snapshot.child("status").getValue().toString();
+                    if (statusAutoLogin.equals("deactivated")) {
+                        auth.signOut();
+                        Toast.makeText(LoginActivity.this, R.string.acc_deactivated, Toast.LENGTH_SHORT).show();
+                    } else {
+                        startActivity(new Intent(LoginActivity.this, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK));
 
-        if (user != null){
-            startActivity(new Intent(LoginActivity.this, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK));
+                        findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+        } else {
+            findViewById(R.id.loadingPanel).setVisibility(View.GONE);
         }
     }
 
@@ -115,6 +194,7 @@ public class LoginActivity extends AppCompatActivity {
                         a.addCategory(Intent.CATEGORY_HOME);
                         a.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(a);
+                        finish();
                     }
                 });
         builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {

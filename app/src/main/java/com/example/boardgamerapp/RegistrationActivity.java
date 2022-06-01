@@ -1,17 +1,29 @@
 package com.example.boardgamerapp;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class RegistrationActivity extends AppCompatActivity {
     private EditText fn;
@@ -20,7 +32,7 @@ public class RegistrationActivity extends AppCompatActivity {
     private EditText email;
     private EditText pass;
     private EditText passConf;
-
+    private ImageButton save;
     private FirebaseDatabase db;
     private FirebaseAuth auth;
 
@@ -40,7 +52,62 @@ public class RegistrationActivity extends AppCompatActivity {
         email = findViewById(R.id.regis_email);
         pass = findViewById(R.id.regis_password);
         passConf = findViewById(R.id.regis_password_conf);
+        save = findViewById(R.id.regis_save_btn);
+        auth = FirebaseAuth.getInstance();
+        db = FirebaseDatabase.getInstance();
 
+        save.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String txt_fn = fn.getText().toString();
+                String txt_ln = ln.getText().toString();
+                String txt_adr = adr.getText().toString();
+                String txt_email = email.getText().toString();
+                String txt_password = pass.getText().toString();
+                String txt_passwordConf = passConf.getText().toString();
+
+                if (TextUtils.isEmpty(txt_email) || TextUtils.isEmpty(txt_password) || TextUtils.isEmpty(txt_fn) || TextUtils.isEmpty(txt_ln) || TextUtils.isEmpty(txt_adr)){
+                    Toast.makeText(RegistrationActivity.this, R.string.check_entries, Toast.LENGTH_SHORT).show();
+                } else if (TextUtils.isEmpty(txt_passwordConf)) {
+                    Toast.makeText(RegistrationActivity.this, R.string.confirm_your_password, Toast.LENGTH_SHORT).show();
+                } else if (!txt_password.equals(txt_passwordConf)) {
+                    Toast.makeText(RegistrationActivity.this, R.string.confirm_your_password_failed, Toast.LENGTH_SHORT).show();
+                } else if (txt_password.length() < 8) {
+                    Toast.makeText(RegistrationActivity.this, R.string.password_too_short, Toast.LENGTH_SHORT).show();
+                } else {
+                    registerUser(txt_email, txt_password, txt_fn, txt_ln, txt_adr);
+                }
+            }
+        });
+
+
+    }
+
+    private void registerUser(String email, String password, String fn, String ln, String adr) {
+        auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(RegistrationActivity.this, new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if (task.isSuccessful()){
+                    DatabaseReference manage = db.getReference("user management");
+                    DatabaseReference ref = db.getReference("users/"+auth.getUid().toString());
+                    Map<String, Object> user = new HashMap<>();
+                    user.put("firstname", fn);
+                    user.put("lastname", ln);
+                    user.put("address", adr);
+                    user.put("email", email);
+                    user.put("status", "regular");
+                    user.put("id", auth.getUid().toString());
+
+                    ref.setValue(user);
+
+                    Toast.makeText(RegistrationActivity.this, R.string.regis_successfull, Toast.LENGTH_SHORT).show();
+                    startActivity(new Intent(RegistrationActivity.this, LoginActivity.class));
+                    finish();
+                } else {
+                    Toast.makeText(RegistrationActivity.this, R.string.regis_failed, Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     @Override
@@ -55,6 +122,7 @@ public class RegistrationActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             startActivity(new Intent(RegistrationActivity.this, LoginActivity.class));
+                            finish();
                         }
                     });
             builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
@@ -68,6 +136,7 @@ public class RegistrationActivity extends AppCompatActivity {
 
         } else {
             startActivity(new Intent(RegistrationActivity.this, LoginActivity.class));
+            finish();
         }
     }
 }

@@ -19,5 +19,6 @@ public class AppointmentActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         startActivity(new Intent(AppointmentActivity.this, MainActivity.class));
+        finish();
     }
 }

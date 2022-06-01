@@ -11,14 +11,17 @@
         <entry key="..\:/Users/Back1/AndroidStudioProjects/BoardGamerApp/app/src/main/res/layout/activity_evaluation.xml" value="0.20471014492753623" />
         <entry key="..\:/Users/Back1/AndroidStudioProjects/BoardGamerApp/app/src/main/res/layout/activity_games.xml" value="0.2" />
         <entry key="..\:/Users/Back1/AndroidStudioProjects/BoardGamerApp/app/src/main/res/layout/activity_late.xml" value="0.176" />
-        <entry key="..\:/Users/Back1/AndroidStudioProjects/BoardGamerApp/app/src/main/res/layout/activity_login.xml" value="0.152" />
+        <entry key="..\:/Users/Back1/AndroidStudioProjects/BoardGamerApp/app/src/main/res/layout/activity_login.xml" value="0.2" />
         <entry key="..\:/Users/Back1/AndroidStudioProjects/BoardGamerApp/app/src/main/res/layout/activity_main.xml" value="0.264" />
         <entry key="..\:/Users/Back1/AndroidStudioProjects/BoardGamerApp/app/src/main/res/layout/activity_management.xml" value="0.264" />
         <entry key="..\:/Users/Back1/AndroidStudioProjects/BoardGamerApp/app/src/main/res/layout/activity_profile.xml" value="0.20471014492753623" />
         <entry key="..\:/Users/Back1/AndroidStudioProjects/BoardGamerApp/app/src/main/res/layout/activity_rating.xml" value="0.20471014492753623" />
         <entry key="..\:/Users/Back1/AndroidStudioProjects/BoardGamerApp/app/src/main/res/layout/activity_registration.xml" value="0.264" />
+        <entry key="..\:/Users/Back1/AndroidStudioProjects/BoardGamerApp/app/src/main/res/layout/activity_reset_password.xml" value="0.2" />
+        <entry key="..\:/Users/Back1/AndroidStudioProjects/BoardGamerApp/app/src/main/res/layout/activity_splashscreen.xml" value="0.11197916666666667" />
         <entry key="..\:/Users/Back1/AndroidStudioProjects/BoardGamerApp/app/src/main/res/layout/list_item.xml" value="0.20471014492753623" />
         <entry key="..\:/Users/Back1/AndroidStudioProjects/BoardGamerApp/app/src/main/res/layout/spinner_item.xml" value="0.20471014492753623" />
+        <entry key="..\:/Users/Back1/AndroidStudioProjects/BoardGamerApp/app/src/main/res/layout/user_spinner_adapter.xml" value="0.15437158469945356" />
         <entry key="..\:/Users/Back1/AndroidStudioProjects/BoardGamerApp/app/src/main/res/menu/actions.xml" value="0.20333333333333334" />
       </map>
     </option>

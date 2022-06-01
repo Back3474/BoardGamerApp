@@ -28,5 +28,6 @@ public class GamesActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         startActivity(new Intent(GamesActivity.this, MainActivity.class));
+        finish();
     }
 }

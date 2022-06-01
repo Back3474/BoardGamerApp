@@ -7,4 +7,5 @@
     android:textSize="20sp"
     android:gravity="end"
     android:padding="5dip"
+    android:id="@+id/test"
     />

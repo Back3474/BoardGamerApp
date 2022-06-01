@@ -40,6 +40,7 @@ public class RatingActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             startActivity(new Intent(RatingActivity.this, MainActivity.class));
+                            finish();
                         }
                     });
             builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {

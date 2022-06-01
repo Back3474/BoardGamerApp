@@ -37,6 +37,7 @@ public class LateActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             startActivity(new Intent(LateActivity.this, MainActivity.class));
+                            finish();
                         }
                     });
             builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
@@ -50,6 +51,7 @@ public class LateActivity extends AppCompatActivity {
 
         } else {
             startActivity(new Intent(LateActivity.this, MainActivity.class));
+            finish();
         }
     }
 }
