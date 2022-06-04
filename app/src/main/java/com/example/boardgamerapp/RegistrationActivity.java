@@ -97,6 +97,7 @@ public class RegistrationActivity extends AppCompatActivity {
                     user.put("email", email);
                     user.put("status", "regular");
                     user.put("id", auth.getUid().toString());
+                    user.put("isAdmin", false);
 
                     ref.setValue(user);
 

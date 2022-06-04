@@ -49,11 +49,10 @@
 
                 <TextView
                     android:id="@+id/choose_user"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_marginStart="15dp"
                     android:layout_marginEnd="5dp"
-                    android:layout_weight="1"
                     android:gravity="center_vertical"
                     android:minHeight="48dp"
                     android:text="@string/mngmnt_chooseUser"
@@ -66,8 +65,7 @@
                     android:layout_marginStart="5dp"
                     android:layout_marginEnd="15dp"
                     android:layout_weight="1"
-                    android:contentDescription="@string/mngmnt_chooseUser"
-                    android:gravity="center_vertical" />
+                    android:contentDescription="@string/mngmnt_chooseUser" />
             </TableRow>
 
             <TableRow
@@ -84,13 +82,13 @@
                     android:text="@string/mngmnt_adminStatus" />
 
                 <Button
-                    android:id="@+id/deleteUser"
+                    android:id="@+id/deactivateUser"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_marginStart="5dp"
                     android:layout_marginEnd="10dp"
                     android:layout_weight="1"
-                    android:text="@string/mngmnt_deleteUser" />
+                    android:text="@string/mngmnt_deactivateUser" />
             </TableRow>
 
         </LinearLayout>

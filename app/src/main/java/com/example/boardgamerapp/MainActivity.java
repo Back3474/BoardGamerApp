@@ -4,18 +4,12 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.app.Service;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.preference.Preference;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
@@ -29,7 +23,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.security.Provider;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuItemClickListener {
     private ImageButton menu;
@@ -43,8 +40,13 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
     private MenuItem mngmnt;
     private LinearLayout meeting_layout;
     private TextView day;
-    private Thread thread;
+    private TextView time;
+    private TextView host;
+    private TextView address;
     private TextView greetText;
+    private LocalDate inputDate;
+    private String date;
+    private int hour, minute;
 
 
 
@@ -57,7 +59,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         overridePendingTransition(com.google.android.material.R.anim.abc_popup_enter, com.google.android.material.R.anim.abc_popup_exit);
 
         auth = FirebaseAuth.getInstance();
-        db = FirebaseDatabase.getInstance();
+        db = FirebaseDatabase.getInstance("https://board-gamer-app-ff958-default-rtdb.firebaseio.com/");
         menu = findViewById(R.id.main_menuBtn);
         late = findViewById(R.id.main_lateBtn);
         rating = findViewById(R.id.main_ratingBtn);
@@ -67,11 +69,36 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         meeting_layout = findViewById(R.id.main_meetingLayout);
         games = findViewById(R.id.main_gamesBtn);
         day = findViewById(R.id.main_mtng_day);
+        time = findViewById(R.id.main_mtng_time);
+        host = findViewById(R.id.main_mtng_host);
+        address = findViewById(R.id.main_mtng_address);
         greetText = findViewById(R.id.greetText);
+        date = "01/01/2000";
 
-
-        DatabaseReference ref = db.getReference("users/"+auth.getUid().toString());
+        DatabaseReference ref = db.getReference("next meeting/");
         ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                date = snapshot.child("date").getValue().toString();
+                inputDate = LocalDate.parse(date);
+                DateTimeFormatter dtf = DateTimeFormatter.ofPattern(getText(R.string.date_format).toString());
+                String date1 = inputDate.format(dtf);
+                day.setText(date1);
+                hour = snapshot.child("hour").getValue(Integer.class);
+                minute = snapshot.child("minute").getValue(Integer.class);
+                time.setText(String.format(Locale.getDefault(), "%02d:%02d", hour, minute));
+                host.setText(snapshot.child("host").getValue().toString());
+                address.setText(snapshot.child("address").getValue().toString());
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        DatabaseReference ref1 = db.getReference("users/"+auth.getUid().toString());
+        ref1.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 greetText.setText(getText(R.string.greetText) +" "+ snapshot.child("firstname").getValue().toString()+"!");
@@ -82,7 +109,6 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
 
             }
         });
-
 
 
 
@@ -173,8 +199,8 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                 ref.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        String status = snapshot.child("status").getValue().toString();
-                        if (status.equals("admin")) {
+                        Boolean adminStatus = (Boolean) snapshot.child("isAdmin").getValue();
+                        if (adminStatus == true) {
                             startActivity(new Intent(MainActivity.this, ManagementActivity.class));
                             finish();
                         } else {
