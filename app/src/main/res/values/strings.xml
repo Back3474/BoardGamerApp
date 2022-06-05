@@ -147,6 +147,8 @@
     <string name="rate_meal_label">Meal</string>
     <string name="rate_gamenight_label">Gamenight</string>
     <string name="rate_user_comment">Comment</string>
+    <string name="games_suggest_game_title">Suggest game</string>
+    <string name="games_suggest_game_msg">Do you want to suggest this game: </string>
 
     <string name="mon">Monday</string>
     <string name="tue">Tuesday</string>
@@ -166,13 +168,4 @@
         <item>@string/sun</item>
     </string-array>
 
-    <string-array name="games_array">
-        <item>"Monopoly"</item>
-        <item>"Mensch ärgere dich nicht"</item>
-        <item>"Häschen in der Grube"</item>
-        <item>"test"</item>
-        <item>"test1"</item>
-        <item>"test2"</item>
-        <item>"test3</item>
-    </string-array>
 </resources>

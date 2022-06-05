@@ -2,8 +2,11 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="wrap_content"
+    android:clickable="false"
+    android:orientation="vertical"
+    android:paddingTop="5dp"
+    android:paddingBottom="5dp">
 
     <TextView
         android:id="@+id/ratingUser"
@@ -31,7 +34,6 @@
         <RatingBar
             android:id="@+id/mealRatingStars"
             style="?android:attr/ratingBarStyleSmall"
-            android:progressTint="#FFCC01"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center|start"
@@ -39,6 +41,7 @@
             android:contentDescription="@string/meal_rate"
             android:max="5"
             android:numStars="5"
+            android:progressTint="#FFCC01"
             android:rating="0"
             android:stepSize="1" />
 
@@ -61,7 +64,6 @@
         <RatingBar
             android:id="@+id/nightRatingStars"
             style="?android:attr/ratingBarStyleSmall"
-            android:progressTint="#FFCC01"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center|start"
@@ -69,6 +71,7 @@
             android:contentDescription="@string/gameNight_rate"
             android:max="5"
             android:numStars="5"
+            android:progressTint="#FFCC01"
             android:rating="0"
             android:stepSize="1" />
     </TableRow>
@@ -88,6 +91,6 @@
         android:layout_height="wrap_content"
         android:paddingStart="10dp"
         android:text="TextView"
-        android:textSize="12sp" />
+        android:textSize="14sp" />
 
 </LinearLayout>

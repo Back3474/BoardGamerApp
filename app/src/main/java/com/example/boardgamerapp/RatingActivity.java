@@ -9,12 +9,16 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.RatingBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -33,12 +37,12 @@ public class RatingActivity extends AppCompatActivity {
     private ImageButton sendRating;
     private FirebaseDatabase db;
     private FirebaseAuth auth;
-    private int mealRating, gamenightRating;
     private ListView ratingsListView;
-    ArrayList<Rating> ratings;
+    private ArrayList<Rating> ratings;
+    private String userName;
+    private int mealRating, nightRating;
+    private Rating rate;
 
-    public RatingActivity() {
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,26 +56,31 @@ public class RatingActivity extends AppCompatActivity {
         rate_msg = findViewById(R.id.rate_msg);
         sendRating = findViewById(R.id.rate_sendBtn);
         ratingsListView = findViewById(R.id.all_ratings_list);
-        ratings = new ArrayList<Rating>();
 
 
         db = FirebaseDatabase.getInstance("https://board-gamer-app-ff958-default-rtdb.firebaseio.com");
         auth = FirebaseAuth.getInstance();
+
+        ratings = new ArrayList<>();
 
         DatabaseReference ref = db.getReference("last gamenight/ratings");
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 ratings.clear();
-                ratings.add(new Rating("test",1,1));
-                for (DataSnapshot dataSnapshot : snapshot.getChildren()){
-                    String userName = "test";
-                    int mealRating = dataSnapshot.child("meal rating").getValue(Integer.class);
-                    int gamenightRating = dataSnapshot.child("gamenight rating").getValue(Integer.class);
-
-                    ratings.add(new Rating(userName, mealRating, gamenightRating));
-
+                for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                    userName = dataSnapshot.child("name").getValue().toString();
+                    mealRating = dataSnapshot.child("meal rating").getValue(Integer.class);
+                    nightRating = dataSnapshot.child("gamenight rating").getValue(Integer.class);
+                    if(dataSnapshot.hasChild("comment")){
+                        String comment = dataSnapshot.child("comment").getValue().toString();
+                        ratings.add(new Rating(userName, mealRating, nightRating, comment));
+                    } else {
+                        ratings.add(new Rating(userName, mealRating, nightRating));
+                    }
                 }
+                ArrayAdapter ratingListAdapter = new RatingListAdapter(RatingActivity.this, ratings);
+                ratingsListView.setAdapter(ratingListAdapter);
             }
 
             @Override
@@ -80,9 +89,6 @@ public class RatingActivity extends AppCompatActivity {
             }
         });
 
-
-        RatingListAdapter listAdapter = new RatingListAdapter(RatingActivity.this, ratings);
-        ratingsListView.setAdapter(listAdapter);
 
         sendRating.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -101,7 +107,20 @@ public class RatingActivity extends AppCompatActivity {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     DatabaseReference ref = db.getReference("last gamenight/ratings");
+                                    DatabaseReference refName = db.getReference("users/"+auth.getUid());
                                     Map<String, Object> rating = new HashMap<>();
+                                    refName.addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                            String name = snapshot.child("firstname").getValue().toString() + " " + snapshot.child("lastname").getValue().toString();
+                                            rating.put("name", name);
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError error) {
+
+                                        }
+                                    });
                                     rating.put("meal rating", rate_meal.getRating());
                                     rating.put("gamenight rating", rate_night.getRating());
                                     if (!TextUtils.isEmpty(rate_msg.getText())) {
@@ -113,14 +132,26 @@ public class RatingActivity extends AppCompatActivity {
                                         public void onDataChange(@NonNull DataSnapshot snapshot) {
                                             String uid = auth.getUid();
                                             if (snapshot.hasChild(uid)) {
-                                                ref.child(String.valueOf(auth.getUid())).setValue(rating);
-                                                Toast.makeText(RatingActivity.this, R.string.rate_rating_changed, Toast.LENGTH_SHORT).show();
+                                                ref.child(String.valueOf(auth.getUid())).setValue(rating).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                    @Override
+                                                    public void onComplete(@NonNull Task<Void> task) {
+                                                        if (task.isSuccessful()) {
+                                                            Toast.makeText(RatingActivity.this, R.string.rate_rating_changed, Toast.LENGTH_SHORT).show();
+                                                        }
+                                                    }
+                                                });
                                                 rate_meal.setRating(0);
                                                 rate_night.setRating(0);
                                                 rate_msg.setText(null);
                                             } else {
-                                                ref.child(String.valueOf(auth.getUid())).setValue(rating);
-                                                Toast.makeText(RatingActivity.this, R.string.rate_rating_success, Toast.LENGTH_SHORT).show();
+                                                ref.child(String.valueOf(auth.getUid())).setValue(rating).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                    @Override
+                                                    public void onComplete(@NonNull Task<Void> task) {
+                                                        if(task.isSuccessful()){
+                                                            Toast.makeText(RatingActivity.this, R.string.rate_rating_success, Toast.LENGTH_SHORT).show();
+                                                        }
+                                                    }
+                                                });
                                                 rate_meal.setRating(0);
                                                 rate_night.setRating(0);
                                                 rate_msg.setText(null);

@@ -44,6 +44,7 @@ public class RatingListAdapter extends ArrayAdapter<Rating> {
         nightRating.setRating(rating.getGamenightRating());
         comment.setText(rating.getComment());
 
+
         return convertView;
     }
 
