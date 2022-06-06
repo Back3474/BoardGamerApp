@@ -4,7 +4,9 @@
     android:layout_height="wrap_content"
     android:gravity="center"
     android:orientation="vertical"
-    android:padding="5dp">
+    android:padding="5dp"
+    android:background="#0000"
+    android:id="@+id/games_list_item_layout">
 
     <TextView
         android:id="@+id/gameName"

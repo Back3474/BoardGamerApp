@@ -4,15 +4,20 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.ClipData;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -35,6 +40,11 @@ public class GamesActivity extends AppCompatActivity {
     private ArrayList<Game> gamesList;
     private ImageButton suggestGame;
     private EditText suggestedGame;
+    private Button voteBtn;
+    private Button cancel;
+    private long votes;
+    private Boolean clickedForVote;
+    private LinearLayout gamesListItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +60,11 @@ public class GamesActivity extends AppCompatActivity {
         gamesList = new ArrayList<>();
         suggestGame = findViewById(R.id.suggestGameBtn);
         suggestedGame = findViewById(R.id.suggestedGame);
+        voteBtn = findViewById(R.id.vote_game_btn);
+        cancel = findViewById(R.id.cancelBtn);
+        clickedForVote = false;
+
+        listView.setClickable(false);
 
         DatabaseReference ref = db.getReference("next meeting/games");
 
@@ -67,11 +82,64 @@ public class GamesActivity extends AppCompatActivity {
                 }
                 ArrayAdapter gamesListAdapter = new GamesListAdapter(GamesActivity.this, 0, gamesList);
                 listView.setAdapter(gamesListAdapter);
+
+                votes = snapshot.child("votes").child(auth.getUid()).getChildrenCount();
+                if (votes == 0){
+                    voteBtn.setText("Vote game (2 votes left)");
+                } else if (votes == 1) {
+                    voteBtn.setText("Vote game (1 vote left)");
+                }
+
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
 
+            }
+        });
+
+
+        voteBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(clickedForVote == false){
+                    if(votes == 2){
+                        Toast.makeText(GamesActivity.this, "voted 2x already", Toast.LENGTH_SHORT).show();
+                    } else {
+                        clickedForVote = true;
+                        Toast.makeText(GamesActivity.this, "click on game for vote", Toast.LENGTH_SHORT).show();
+                        voteBtn.setText("confirm votes");
+                        listView.setBackgroundResource(R.drawable.border_colored);
+                        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                                if (!view.isSelected()){
+                                    view.setBackgroundResource(R.color.design_light);
+                                    view.setSelected(true);
+                                }
+                            }
+                        });
+
+                    }
+                    cancel.setVisibility(View.VISIBLE);
+                    cancel.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            if (votes == 0){
+                                voteBtn.setText("Vote game (2 votes left)");
+                            } else if (votes == 1) {
+                                voteBtn.setText("Vote game (1 vote left)");
+                            }
+                            cancel.setVisibility(View.INVISIBLE);
+                            listView.setBackgroundResource(R.drawable.border);
+                            clickedForVote = false;
+                        }
+                    });
+                } else {
+                    Toast.makeText(GamesActivity.this, "test", Toast.LENGTH_SHORT).show();
+                    clickedForVote = false;
+                }
+                
             }
         });
 
@@ -84,7 +152,7 @@ public class GamesActivity extends AppCompatActivity {
                     AlertDialog.Builder builder = new AlertDialog.Builder(GamesActivity.this);
                     builder.setCancelable(true);
                     builder.setTitle(R.string.games_suggest_game_title);
-                    builder.setMessage(getText(R.string.games_suggest_game_msg) + suggestedGame.getText().toString() + "?");
+                    builder.setMessage(getText(R.string.games_suggest_game_msg) + " " + suggestedGame.getText().toString() + "?");
                     builder.setPositiveButton(R.string.discard_yes,
                             new DialogInterface.OnClickListener() {
                                 @Override

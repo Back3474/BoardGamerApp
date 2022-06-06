@@ -139,16 +139,19 @@
     <string name="date_format">MM/dd/yyyy</string>
     <string name="games_suggest_game_btn">suggest game</string>
     <string name="rate_last_gamenight_title">Rate last Gamenight</string>
-    <string name="rate_last_gamenight_msg">Do you want to rate the last Gamenight? (your rating: </string>
+    <string name="rate_last_gamenight_msg">Do you want to rate the last Gamenight? (your rating:</string>
+    <string name="change_rate_last_gamenight_msg">Do you want to change your rating to:</string>
     <string name="rate_pls_rate_meal">Please rate the meal at first!</string>
     <string name="rate_pls_rate_night">Please rate the gamenight overall!</string>
     <string name="rate_rating_changed">Your rating has been changed successfully!</string>
     <string name="rate_rating_success">Your rating was added successfully!"</string>
     <string name="rate_meal_label">Meal</string>
     <string name="rate_gamenight_label">Gamenight</string>
+    <string name="rate_all_ratings_label">All ratings</string>
     <string name="rate_user_comment">Comment</string>
+    <string name="rate_change_rating_title">Change rating</string>
     <string name="games_suggest_game_title">Suggest game</string>
-    <string name="games_suggest_game_msg">Do you want to suggest this game: </string>
+    <string name="games_suggest_game_msg">Do you want to suggest this game:</string>
 
     <string name="mon">Monday</string>
     <string name="tue">Tuesday</string>

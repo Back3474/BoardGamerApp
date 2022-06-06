@@ -4,6 +4,7 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Users/Back1/AndroidStudioProjects/BoardGamerApp/app/src/main/res/drawable/border.xml" value="0.1" />
+        <entry key="..\:/Users/Back1/AndroidStudioProjects/BoardGamerApp/app/src/main/res/drawable/border_colored.xml" value="0.1" />
         <entry key="..\:/Users/Back1/AndroidStudioProjects/BoardGamerApp/app/src/main/res/layout/activity_account.xml" value="0.264" />
         <entry key="..\:/Users/Back1/AndroidStudioProjects/BoardGamerApp/app/src/main/res/layout/activity_appointment.xml" value="0.20471014492753623" />
         <entry key="..\:/Users/Back1/AndroidStudioProjects/BoardGamerApp/app/src/main/res/layout/activity_change_password.xml" value="0.20471014492753623" />

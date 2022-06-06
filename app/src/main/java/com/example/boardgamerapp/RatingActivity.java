@@ -7,11 +7,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Layout;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RatingBar;
 import android.widget.TextView;
@@ -42,7 +44,9 @@ public class RatingActivity extends AppCompatActivity {
     private String userName;
     private int mealRating, nightRating;
     private Rating rate;
-
+    private Boolean ratedAlready;
+    private Map<String, Object> rating;
+    private String name;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +60,8 @@ public class RatingActivity extends AppCompatActivity {
         rate_msg = findViewById(R.id.rate_msg);
         sendRating = findViewById(R.id.rate_sendBtn);
         ratingsListView = findViewById(R.id.all_ratings_list);
+        ratedAlready = false;
+        rating = new HashMap<>();
 
 
         db = FirebaseDatabase.getInstance("https://board-gamer-app-ff958-default-rtdb.firebaseio.com");
@@ -63,10 +69,28 @@ public class RatingActivity extends AppCompatActivity {
 
         ratings = new ArrayList<>();
 
+        LinearLayout allRatingsLayout = findViewById(R.id.allRatings_layout);
+        allRatingsLayout.setVisibility(View.GONE);
+
         DatabaseReference ref = db.getReference("last gamenight/ratings");
+        DatabaseReference refName = db.getReference("users/"+auth.getUid());
+
+        refName.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                name = snapshot.child("firstname").getValue().toString() + " " + snapshot.child("lastname").getValue().toString();
+                }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                ratedAlready = snapshot.hasChild(auth.getUid());
                 ratings.clear();
                 for(DataSnapshot dataSnapshot : snapshot.getChildren()){
                     userName = dataSnapshot.child("name").getValue().toString();
@@ -79,6 +103,9 @@ public class RatingActivity extends AppCompatActivity {
                         ratings.add(new Rating(userName, mealRating, nightRating));
                     }
                 }
+                if (!ratings.isEmpty()){
+                    allRatingsLayout.setVisibility(View.VISIBLE);
+                }
                 ArrayAdapter ratingListAdapter = new RatingListAdapter(RatingActivity.this, ratings);
                 ratingsListView.setAdapter(ratingListAdapter);
             }
@@ -89,7 +116,6 @@ public class RatingActivity extends AppCompatActivity {
             }
         });
 
-
         sendRating.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -97,74 +123,78 @@ public class RatingActivity extends AppCompatActivity {
                     Toast.makeText(RatingActivity.this, R.string.rate_pls_rate_meal, Toast.LENGTH_SHORT).show();
                 } else if (rate_night.getRating() == 0){
                     Toast.makeText(RatingActivity.this, R.string.rate_pls_rate_night, Toast.LENGTH_SHORT).show();
+                } else if (ratedAlready == true){
+                    AlertDialog.Builder builder = new AlertDialog.Builder(RatingActivity.this);
+                    builder.setCancelable(true);
+                    builder.setTitle(R.string.rate_change_rating_title);
+                    if (TextUtils.isEmpty(rate_msg.getText())){
+                        builder.setMessage(getText(R.string.change_rate_last_gamenight_msg) + " " + String.valueOf(rate_meal.getRating()) + "/ " + String.valueOf(rate_night.getRating() + "?"));
+                    } else {
+                        builder.setMessage(getText(R.string.change_rate_last_gamenight_msg) + " " + String.valueOf(rate_meal.getRating()) + "/ " + String.valueOf(rate_night.getRating() + ", " + getText(R.string.rate_user_comment) +": " + rate_msg.getText() + "?"));
+                    }
+                    builder.setPositiveButton(R.string.discard_yes, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            rating.put("name", name);
+                            rating.put("meal rating", rate_meal.getRating());
+                            rating.put("gamenight rating", rate_night.getRating());
+                            if (!TextUtils.isEmpty(rate_msg.getText())) {
+                                String adjustedComment = rate_msg.getText().toString().replaceAll("(?m)^[ \t]*\r?\n", "");
+                                rating.put("comment", adjustedComment);
+                            }
+                            ref.child(auth.getUid()).setValue(rating).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if (task.isSuccessful()) {
+                                        Toast.makeText(RatingActivity.this, R.string.rate_rating_changed, Toast.LENGTH_SHORT).show();
+                                        rating.clear();
+                                    }
+                                }
+                            });
+                            rate_meal.setRating(0);
+                            rate_night.setRating(0);
+                            rate_msg.setText(null);
+                        }
+                    });
+
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
+
                 } else {
                     AlertDialog.Builder builder = new AlertDialog.Builder(RatingActivity.this);
                     builder.setCancelable(true);
                     builder.setTitle(R.string.rate_last_gamenight_title);
-                    builder.setMessage(getText(R.string.rate_last_gamenight_msg) + " " + String.valueOf(rate_meal.getRating()) + "/ " + String.valueOf(rate_night.getRating() + ")"));
-                    builder.setPositiveButton(R.string.discard_yes,
-                            new DialogInterface.OnClickListener() {
+                    if (TextUtils.isEmpty(rate_msg.getText())){
+                        builder.setMessage(getText(R.string.rate_last_gamenight_msg) + " " + String.valueOf(rate_meal.getRating()) + "/ " + String.valueOf(rate_night.getRating()) + ")");
+                    } else {
+                        builder.setMessage(getText(R.string.rate_last_gamenight_msg) + " " + String.valueOf(rate_meal.getRating()) + "/ " + String.valueOf(rate_night.getRating() + ", " + getText(R.string.rate_user_comment) +": " + rate_msg.getText()) + ")");
+                    }
+                    builder.setPositiveButton(R.string.discard_yes, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            rating.put("name", name);
+                            rating.put("meal rating", rate_meal.getRating());
+                            rating.put("gamenight rating", rate_night.getRating());
+                            if (!TextUtils.isEmpty(rate_msg.getText())) {
+                                String adjustedComment = rate_msg.getText().toString().replaceAll("(?m)^[ \t]*\r?\n", "");
+                                rating.put("comment", adjustedComment);
+                            }
+
+                            ref.child(auth.getUid()).setValue(rating).addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    DatabaseReference ref = db.getReference("last gamenight/ratings");
-                                    DatabaseReference refName = db.getReference("users/"+auth.getUid());
-                                    Map<String, Object> rating = new HashMap<>();
-                                    refName.addListenerForSingleValueEvent(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                            String name = snapshot.child("firstname").getValue().toString() + " " + snapshot.child("lastname").getValue().toString();
-                                            rating.put("name", name);
-                                        }
-
-                                        @Override
-                                        public void onCancelled(@NonNull DatabaseError error) {
-
-                                        }
-                                    });
-                                    rating.put("meal rating", rate_meal.getRating());
-                                    rating.put("gamenight rating", rate_night.getRating());
-                                    if (!TextUtils.isEmpty(rate_msg.getText())) {
-                                        rating.put("comment", rate_msg.getText().toString());
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if(task.isSuccessful()){
+                                        Toast.makeText(RatingActivity.this, R.string.rate_rating_success, Toast.LENGTH_SHORT).show();
+                                        rating.clear();
                                     }
-
-                                    ref.addListenerForSingleValueEvent(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                            String uid = auth.getUid();
-                                            if (snapshot.hasChild(uid)) {
-                                                ref.child(String.valueOf(auth.getUid())).setValue(rating).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                    @Override
-                                                    public void onComplete(@NonNull Task<Void> task) {
-                                                        if (task.isSuccessful()) {
-                                                            Toast.makeText(RatingActivity.this, R.string.rate_rating_changed, Toast.LENGTH_SHORT).show();
-                                                        }
-                                                    }
-                                                });
-                                                rate_meal.setRating(0);
-                                                rate_night.setRating(0);
-                                                rate_msg.setText(null);
-                                            } else {
-                                                ref.child(String.valueOf(auth.getUid())).setValue(rating).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                    @Override
-                                                    public void onComplete(@NonNull Task<Void> task) {
-                                                        if(task.isSuccessful()){
-                                                            Toast.makeText(RatingActivity.this, R.string.rate_rating_success, Toast.LENGTH_SHORT).show();
-                                                        }
-                                                    }
-                                                });
-                                                rate_meal.setRating(0);
-                                                rate_night.setRating(0);
-                                                rate_msg.setText(null);
-                                            }
-                                        }
-
-                                        @Override
-                                        public void onCancelled(@NonNull DatabaseError error) {
-
-                                        }
-                                    });
                                 }
                             });
+                            rate_meal.setRating(0);
+                            rate_night.setRating(0);
+                            rate_msg.setText(null);
+                        }
+                    });
+
                     builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
