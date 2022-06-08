@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Dialog;
 import android.content.ClipData;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -30,11 +31,13 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class GamesActivity extends AppCompatActivity {
     private ListView listView;
     private String gameName;
-    private int gameVotes;
+    private int gameVotes, userSuggestedGames;
     private FirebaseDatabase db;
     private FirebaseAuth auth;
     private ArrayList<Game> gamesList;
@@ -45,6 +48,7 @@ public class GamesActivity extends AppCompatActivity {
     private long votes;
     private Boolean clickedForVote;
     private LinearLayout gamesListItem;
+    private String votedGame;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,14 +65,36 @@ public class GamesActivity extends AppCompatActivity {
         suggestGame = findViewById(R.id.suggestGameBtn);
         suggestedGame = findViewById(R.id.suggestedGame);
         voteBtn = findViewById(R.id.vote_game_btn);
-        cancel = findViewById(R.id.cancelBtn);
         clickedForVote = false;
+        votedGame = "defaultValue";
 
         listView.setClickable(false);
 
-        DatabaseReference ref = db.getReference("next meeting/games");
+        DatabaseReference refNextMeeting = db.getReference("next meeting/");
+        DatabaseReference refVotes = refNextMeeting.child("votes");
+        DatabaseReference refGames = refNextMeeting.child("games");
 
-        ref.addValueEventListener(new ValueEventListener() {
+        refNextMeeting.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.hasChild("votes")){
+                    votes = snapshot.child("votes").child(auth.getUid()).getChildrenCount();
+                }
+                if (votes == 0){
+                    voteBtn.setText(R.string.games_suggest_game_two_votes_left);
+                } else if (votes == 1) {
+                    voteBtn.setText(R.string.games_suggest_game_one_vote_left);
+                } else {
+                    voteBtn.setText(R.string.games_vote_btn_no_more_votes);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+        refGames.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 gamesList.clear();
@@ -78,17 +104,137 @@ public class GamesActivity extends AppCompatActivity {
                     gamesList.add(new Game(gameName, gameVotes));
                 }
                 if (gamesList.isEmpty()){
-                    gamesList.add(new Game("no games suggested", 0));
+                    gamesList.add(new Game(getText(R.string.games_no_games_suggested).toString(), 0));
+                    voteBtn.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            Toast.makeText(GamesActivity.this, R.string.games_no_games_suggested, Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                } else {
+                    voteBtn.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+
+                            if(votes == 2){
+                                Toast.makeText(GamesActivity.this, R.string.games_voted_2x_already, Toast.LENGTH_SHORT).show();
+                            } else if(clickedForVote == false){
+                                Toast.makeText(GamesActivity.this, R.string.games_click_on_game_vote, Toast.LENGTH_SHORT).show();
+                                voteBtn.setText(R.string.games_cancel);
+                                listView.setBackgroundResource(R.drawable.border_colored);
+                                clickedForVote = true;
+                                refNextMeeting.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                        if(snapshot.child("votes").hasChild(auth.getUid())){
+                                            votedGame = snapshot.child("votes").child(auth.getUid()).child("vote1").getValue().toString();
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError error) {
+
+                                    }
+                                });
+                                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                                    @Override
+                                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                                        TextView gameName = view.findViewById(R.id.gameName);
+
+                                        if(votedGame.equals(gameName.getText().toString())){
+                                            Toast.makeText(GamesActivity.this, R.string.games_vote_not_same_game, Toast.LENGTH_SHORT).show();
+                                        } else {
+                                            AlertDialog.Builder builder = new AlertDialog.Builder(GamesActivity.this);
+                                            builder.setTitle(gameName.getText());
+                                            builder.setMessage(getText(R.string.games_vote_for_game_msg) + " " + gameName.getText() + "?");
+                                            builder.setPositiveButton(R.string.discard_yes, new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialogInterface, int i) {
+
+                                                    refGames.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                        @Override
+                                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                                            int oldVotes = snapshot.child(gameName.getText().toString()).child("votes").getValue(Integer.class);
+                                                            int newVotes = oldVotes + 1;
+                                                            refGames.child(gameName.getText().toString()).child("votes").setValue(newVotes).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                @Override
+                                                                public void onComplete(@NonNull Task<Void> task) {
+                                                                    refVotes.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                                        @Override
+                                                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                                                            if(snapshot.child(auth.getUid()).hasChild("vote1")){
+                                                                                refVotes.child(auth.getUid()).child("vote2").setValue(gameName.getText().toString()).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                                    @Override
+                                                                                    public void onComplete(@NonNull Task<Void> task) {
+                                                                                        Toast.makeText(GamesActivity.this, R.string.games_vote_success, Toast.LENGTH_SHORT).show();
+                                                                                        listView.setBackgroundResource(R.drawable.border);
+                                                                                        clickedForVote = false;
+                                                                                        listView.setOnItemClickListener(null);
+                                                                                    }
+                                                                                });
+                                                                            }else {
+                                                                                refVotes.child(auth.getUid()).child("vote1").setValue(gameName.getText().toString()).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                                    @Override
+                                                                                    public void onComplete(@NonNull Task<Void> task) {
+                                                                                        Toast.makeText(GamesActivity.this, R.string.games_vote_success, Toast.LENGTH_SHORT).show();
+                                                                                        listView.setBackgroundResource(R.drawable.border);
+                                                                                        clickedForVote = false;
+                                                                                        listView.setOnItemClickListener(null);
+                                                                                    }
+                                                                                });
+                                                                            }
+                                                                        }
+
+                                                                        @Override
+                                                                        public void onCancelled(@NonNull DatabaseError error) {
+
+                                                                        }
+                                                                    });
+                                                                }
+                                                            });
+
+
+                                                        }
+
+                                                        @Override
+                                                        public void onCancelled(@NonNull DatabaseError error) {
+
+                                                        }
+                                                    });
+                                                }
+                                            });
+                                            Dialog dialog = builder.create();
+                                            dialog.show();
+                                        }
+
+                                    }
+                                });
+                            } else {
+                                refVotes.addValueEventListener(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                        votes = snapshot.child(auth.getUid()).getChildrenCount();
+                                        if (votes == 0){
+                                            voteBtn.setText(R.string.games_suggest_game_two_votes_left);
+                                        } else if (votes == 1) {
+                                            voteBtn.setText(R.string.games_suggest_game_one_vote_left);
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError error) {
+
+                                    }
+                                });
+                                listView.setBackgroundResource(R.drawable.border);
+                                clickedForVote = false;
+                                listView.setOnItemClickListener(null);
+                            }
+                        }
+                    });
                 }
                 ArrayAdapter gamesListAdapter = new GamesListAdapter(GamesActivity.this, 0, gamesList);
                 listView.setAdapter(gamesListAdapter);
-
-                votes = snapshot.child("votes").child(auth.getUid()).getChildrenCount();
-                if (votes == 0){
-                    voteBtn.setText("Vote game (2 votes left)");
-                } else if (votes == 1) {
-                    voteBtn.setText("Vote game (1 vote left)");
-                }
 
             }
 
@@ -98,76 +244,44 @@ public class GamesActivity extends AppCompatActivity {
             }
         });
 
-
-        voteBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(clickedForVote == false){
-                    if(votes == 2){
-                        Toast.makeText(GamesActivity.this, "voted 2x already", Toast.LENGTH_SHORT).show();
-                    } else {
-                        clickedForVote = true;
-                        Toast.makeText(GamesActivity.this, "click on game for vote", Toast.LENGTH_SHORT).show();
-                        voteBtn.setText("confirm votes");
-                        listView.setBackgroundResource(R.drawable.border_colored);
-                        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                            @Override
-                            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                                if (!view.isSelected()){
-                                    view.setBackgroundResource(R.color.design_light);
-                                    view.setSelected(true);
-                                }
-                            }
-                        });
-
-                    }
-                    cancel.setVisibility(View.VISIBLE);
-                    cancel.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            if (votes == 0){
-                                voteBtn.setText("Vote game (2 votes left)");
-                            } else if (votes == 1) {
-                                voteBtn.setText("Vote game (1 vote left)");
-                            }
-                            cancel.setVisibility(View.INVISIBLE);
-                            listView.setBackgroundResource(R.drawable.border);
-                            clickedForVote = false;
-                        }
-                    });
-                } else {
-                    Toast.makeText(GamesActivity.this, "test", Toast.LENGTH_SHORT).show();
-                    clickedForVote = false;
-                }
-                
-            }
-        });
-
         suggestGame.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(TextUtils.isEmpty(suggestedGame.getText())){
-                    Toast.makeText(GamesActivity.this, "enter game for suggestion", Toast.LENGTH_SHORT).show();
-                } else {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(GamesActivity.this);
-                    builder.setCancelable(true);
-                    builder.setTitle(R.string.games_suggest_game_title);
-                    builder.setMessage(getText(R.string.games_suggest_game_msg) + " " + suggestedGame.getText().toString() + "?");
-                    builder.setPositiveButton(R.string.discard_yes,
-                            new DialogInterface.OnClickListener() {
+                refGames.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        userSuggestedGames = 0;
+                            for (DataSnapshot dataSnapshot : snapshot.getChildren()){
+                                if(dataSnapshot.child("recommender").getValue().equals(auth.getUid())){
+                                    userSuggestedGames = userSuggestedGames + 1;
+                                }
+                            }
+                        if(TextUtils.isEmpty(suggestedGame.getText())){
+                            Toast.makeText(GamesActivity.this, R.string.games_suggest_game_txt, Toast.LENGTH_SHORT).show();
+                        } else if(userSuggestedGames > 1){
+                            Toast.makeText(GamesActivity.this, R.string.games_suggested_2x_already, Toast.LENGTH_SHORT).show();
+                        } else {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(GamesActivity.this);
+                            builder.setCancelable(true);
+                            builder.setTitle(R.string.games_suggest_game_title);
+                            builder.setMessage(getText(R.string.games_suggest_game_msg) + " " + suggestedGame.getText().toString() + "?");
+                            builder.setPositiveButton(R.string.discard_yes, new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    ref.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    refNextMeeting.addListenerForSingleValueEvent(new ValueEventListener() {
                                         @Override
                                         public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                            if (snapshot.hasChild(suggestedGame.getText().toString())){
-                                                Toast.makeText(GamesActivity.this, "game already suggested", Toast.LENGTH_SHORT).show();
+                                            if (snapshot.child("games").hasChild(suggestedGame.getText().toString())){
+                                                Toast.makeText(GamesActivity.this, R.string.games_suggest_game_alreadySuggested, Toast.LENGTH_SHORT).show();
                                             }else {
-                                                ref.child(suggestedGame.getText().toString()).child("votes").setValue(0).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                Map<String, Object> newGame = new HashMap<>();
+                                                newGame.put("votes", 0);
+                                                newGame.put("recommender", auth.getUid());
+                                                refNextMeeting.child("games").child(suggestedGame.getText().toString()).setValue(newGame).addOnCompleteListener(new OnCompleteListener<Void>() {
                                                     @Override
                                                     public void onComplete(@NonNull Task<Void> task) {
                                                         if (task.isSuccessful()){
-                                                            Toast.makeText(GamesActivity.this, "game added", Toast.LENGTH_SHORT).show();
+                                                            Toast.makeText(GamesActivity.this, R.string.games_suggest_game_successfull, Toast.LENGTH_SHORT).show();
                                                             suggestedGame.setText(null);
                                                         }
                                                     }
@@ -183,15 +297,23 @@ public class GamesActivity extends AppCompatActivity {
 
                                 }
                             });
-                    builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                        }
-                    });
+                            builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                }
+                            });
 
-                    AlertDialog dialog = builder.create();
-                    dialog.show();
-                }
+                            AlertDialog dialog = builder.create();
+                            dialog.show();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+
             }
         });
 

@@ -152,6 +152,20 @@
     <string name="rate_change_rating_title">Change rating</string>
     <string name="games_suggest_game_title">Suggest game</string>
     <string name="games_suggest_game_msg">Do you want to suggest this game:</string>
+    <string name="games_suggest_game_txt">Please enter a game for suggestion!</string>
+    <string name="games_suggest_game_alreadySuggested">This game has already been suggested!</string>
+    <string name="games_suggest_game_successfull">Game suggested successfully!</string>
+    <string name="games_suggest_game_two_votes_left">Vote game (2 votes left)</string>
+    <string name="games_suggest_game_one_vote_left">Vote game (1 vote left)</string>
+    <string name="games_no_games_suggested">no games suggested</string>
+    <string name="games_cancel">cancel</string>
+    <string name="games_voted_2x_already">You voted 2x already!</string>
+    <string name="games_suggested_2x_already">You suggested 2 games already!</string>
+    <string name="games_click_on_game_vote">Click on the game you want to vote for!</string>
+    <string name="games_vote_for_game_msg">Do you want to vote for:</string>
+    <string name="games_vote_btn_no_more_votes">No votes left</string>
+    <string name="games_vote_not_same_game">You can\'t vote for the same game twice!</string>
+    <string name="games_vote_success">Voted successfully!</string>
 
     <string name="mon">Monday</string>
     <string name="tue">Tuesday</string>

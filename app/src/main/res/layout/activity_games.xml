@@ -99,14 +99,6 @@
             android:layout_margin="10dp"
             android:text="@string/games_vote_game_btn" />
 
-        <Button
-            android:id="@+id/cancelBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:text="cancel"
-            android:visibility="invisible"/>
-
         <ImageView
             android:id="@+id/imageView8"
             android:layout_width="150dp"
