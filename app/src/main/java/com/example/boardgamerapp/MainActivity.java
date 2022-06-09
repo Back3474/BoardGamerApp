@@ -6,7 +6,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -26,27 +28,20 @@ import com.google.firebase.database.ValueEventListener;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuItemClickListener {
-    private ImageButton menu;
-    private Button late;
-    private Button rating;
-    private Button games;
+    private ImageButton menu, editMeetingBtn;
+    private Button late, rating, games, cannotTakePartBtn;
     private FirebaseAuth auth;
     private FirebaseDatabase db;
-    private MenuItem acc;
-    private MenuItem logout;
-    private MenuItem mngmnt;
-    private LinearLayout meeting_layout;
-    private TextView day;
-    private TextView time;
-    private TextView host;
-    private TextView address;
-    private TextView greetText;
+    private MenuItem acc, logout, mngmnt;
+    private TextView day, time, host, address, greetText, allParticipants, nextMeeting, notTakingPart, lateParticipantsLabel, lateParticipants;
     private LocalDate inputDate;
-    private String date;
+    private String date, userLatetime_txt;
     private int hour, minute;
+    private HashMap<String, Object> participants;
 
 
 
@@ -66,7 +61,6 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         acc = findViewById(R.id.menu_acc);
         logout = findViewById(R.id.menu_logout);
         mngmnt = findViewById(R.id.menu_mngmnt);
-        meeting_layout = findViewById(R.id.main_meetingLayout);
         games = findViewById(R.id.main_gamesBtn);
         day = findViewById(R.id.main_mtng_day);
         time = findViewById(R.id.main_mtng_time);
@@ -74,6 +68,18 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         address = findViewById(R.id.main_mtng_address);
         greetText = findViewById(R.id.greetText);
         date = "01/01/2000";
+        participants = new HashMap<>();
+        allParticipants = findViewById(R.id.main_mtng_allParticipants);
+        cannotTakePartBtn = findViewById(R.id.main_cannotTakePart);
+        nextMeeting = findViewById(R.id.main_nextMeeting);
+        notTakingPart = findViewById(R.id.not_taking_part_txt);
+        editMeetingBtn = findViewById(R.id.editMeetingBtn);
+        lateParticipantsLabel = findViewById(R.id.late_time_label);
+        lateParticipants = findViewById(R.id.late_participants);
+        userLatetime_txt = null;
+
+        lateParticipants.setVisibility(View.GONE);
+        lateParticipantsLabel.setVisibility(View.GONE);
 
         DatabaseReference ref = db.getReference("next meeting/");
         ref.addValueEventListener(new ValueEventListener() {
@@ -89,6 +95,49 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                 time.setText(String.format(Locale.getDefault(), "%02d:%02d", hour, minute));
                 host.setText(snapshot.child("host").getValue().toString());
                 address.setText(snapshot.child("address").getValue().toString());
+                if(!snapshot.child("participants").hasChild(auth.getUid())){
+                    notTakingPart.setText(R.string.user_not_taking_part);
+                    notTakingPart.setTextColor(Color.RED);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        DatabaseReference refParticipants = db.getReference("next meeting/participants");
+        refParticipants.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                participants.clear();
+                for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                    String uid = dataSnapshot.getKey().toString();
+                    String name = dataSnapshot.child("name").getValue().toString();
+                    participants.put(uid, name);
+                    String newAllParticipants;
+                    if(TextUtils.isEmpty(allParticipants.getText())){
+                        newAllParticipants = name;
+                    } else {
+                        newAllParticipants = allParticipants.getText() + ", " + name;
+                    }
+                    allParticipants.setText(newAllParticipants);
+                    if(dataSnapshot.hasChild("latetime")){
+                        lateParticipantsLabel.setVisibility(View.VISIBLE);
+                        lateParticipants.setVisibility(View.VISIBLE);
+                        userLatetime_txt = String.valueOf(dataSnapshot.child("latetime").getValue(Integer.class));
+                        if(TextUtils.isEmpty(lateParticipants.getText())){
+                            lateParticipants.setText(name + ": " + userLatetime_txt + " min");
+                        } else {
+                            lateParticipants.setText(lateParticipants.getText().toString() + ", " + name + ": " + userLatetime_txt + " min");
+                        }
+                    }
+
+                }
+                if(participants.isEmpty()){
+                    allParticipants.setText(null);
+                }
             }
 
             @Override
@@ -102,6 +151,9 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 greetText.setText(getText(R.string.greetText) +" "+ snapshot.child("firstname").getValue().toString()+"!");
+                if(snapshot.child("isHost").getValue(Boolean.class) == false ){
+                    editMeetingBtn.setVisibility(View.GONE);
+                }
             }
 
             @Override
@@ -110,9 +162,46 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
             }
         });
 
+        cannotTakePartBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                refParticipants.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if(!snapshot.hasChild(auth.getUid())){
+                            Toast.makeText(MainActivity.this, R.string.user_not_taking_part_already, Toast.LENGTH_SHORT).show();
+                        } else {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                            builder.setCancelable(true);
+                            builder.setTitle(R.string.main_cannotTakePart);
+                            builder.setMessage(R.string.main_cannot_take_part_msg);
+                            builder.setPositiveButton(R.string.discard_yes, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    refParticipants.child(auth.getUid()).removeValue();
+                                }
+                            });
+                            builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
 
+                                }
+                            });
+                            AlertDialog dialog = builder.create();
+                            dialog.show();
+                        }
+                    }
 
-        meeting_layout.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+
+            }
+        });
+
+        editMeetingBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(MainActivity.this, AppointmentActivity.class));

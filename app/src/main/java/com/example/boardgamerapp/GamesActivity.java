@@ -31,6 +31,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -102,6 +104,12 @@ public class GamesActivity extends AppCompatActivity {
                     gameName = dataSnapshot.getKey().toString();
                     gameVotes = dataSnapshot.child("votes").getValue(Integer.class);
                     gamesList.add(new Game(gameName, gameVotes));
+                    Collections.sort(gamesList, new Comparator<Game>() {
+                        @Override
+                        public int compare(Game game, Game t1) {
+                            return Integer.valueOf(t1.getVotes()).compareTo(Integer.valueOf(game.getVotes()));
+                        }
+                    });
                 }
                 if (gamesList.isEmpty()){
                     gamesList.add(new Game(getText(R.string.games_no_games_suggested).toString(), 0));
@@ -145,6 +153,7 @@ public class GamesActivity extends AppCompatActivity {
                                             Toast.makeText(GamesActivity.this, R.string.games_vote_not_same_game, Toast.LENGTH_SHORT).show();
                                         } else {
                                             AlertDialog.Builder builder = new AlertDialog.Builder(GamesActivity.this);
+                                            builder.setCancelable(true);
                                             builder.setTitle(gameName.getText());
                                             builder.setMessage(getText(R.string.games_vote_for_game_msg) + " " + gameName.getText() + "?");
                                             builder.setPositiveButton(R.string.discard_yes, new DialogInterface.OnClickListener() {

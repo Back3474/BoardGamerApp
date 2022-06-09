@@ -59,18 +59,42 @@
             android:clickable="true"
             android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/main_nextMeeting"
+            <TableRow
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginEnd="10dp"
-                android:layout_marginBottom="5dp"
-                android:clickable="false"
-                android:text="@string/next_meeting"
-                android:textSize="22sp"
-                android:textStyle="bold" />
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/main_nextMeeting"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginBottom="5dp"
+                    android:clickable="false"
+                    android:text="@string/next_meeting"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/not_taking_part_txt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:textSize="16sp" />
+
+                <ImageButton
+                    android:id="@+id/editMeetingBtn"
+                    android:layout_width="50dp"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_weight="1"
+                    android:background="#0000"
+                    android:contentDescription="@string/main_edit_btn"
+                    android:scaleType="fitEnd"
+                    app:srcCompat="@drawable/edit_pencil" />
+            </TableRow>
 
             <TextView
                 android:id="@+id/nxt_mtng_date"
@@ -157,11 +181,55 @@
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="5dp"
                 android:layout_marginEnd="10dp"
-                android:layout_marginBottom="10dp"
+                android:layout_marginBottom="5dp"
                 android:clickable="false"
                 android:gravity="center_horizontal"
                 android:text="@string/main_mtng_address"
                 android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/next_mtng_participants"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="5dp"
+                android:text="@string/next_mtng_participants"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/main_mtng_allParticipants"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="5dp"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/late_time_label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="5dp"
+                android:text="@string/main_late_time_label"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/late_participants"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="10dp"
+                android:textSize="16sp"
                 android:textStyle="bold" />
 
         </LinearLayout>

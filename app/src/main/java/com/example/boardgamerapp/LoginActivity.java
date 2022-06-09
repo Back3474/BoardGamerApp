@@ -144,6 +144,8 @@ public class LoginActivity extends AppCompatActivity {
 
                         }
                     });
+                } else {
+                    Toast.makeText(LoginActivity.this, "wrong email or password", Toast.LENGTH_SHORT).show();
                 }
             }
         });
