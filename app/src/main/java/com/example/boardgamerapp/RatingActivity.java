@@ -7,7 +7,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.Layout;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -16,7 +15,6 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RatingBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -41,6 +39,7 @@ public class RatingActivity extends AppCompatActivity {
     private FirebaseAuth auth;
     private ListView ratingsListView;
     private ArrayList<Rating> ratings;
+    private ArrayList<String> participantsLastGamenight;
     private String userName;
     private int mealRating, nightRating;
     private Rating rate;
@@ -68,12 +67,30 @@ public class RatingActivity extends AppCompatActivity {
         auth = FirebaseAuth.getInstance();
 
         ratings = new ArrayList<>();
+        participantsLastGamenight = new ArrayList<>();
 
         LinearLayout allRatingsLayout = findViewById(R.id.allRatings_layout);
         allRatingsLayout.setVisibility(View.GONE);
 
         DatabaseReference ref = db.getReference("last gamenight/ratings");
         DatabaseReference refName = db.getReference("users/"+auth.getUid());
+        DatabaseReference refParticipants = db.getReference("last gamenight/participants");
+
+        refParticipants.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                participantsLastGamenight.clear();
+                for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                    String uid = dataSnapshot.getKey().toString();
+                    participantsLastGamenight.add(uid);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
 
         refName.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -119,92 +136,106 @@ public class RatingActivity extends AppCompatActivity {
         sendRating.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (rate_meal.getRating() == 0){
-                    Toast.makeText(RatingActivity.this, R.string.rate_pls_rate_meal, Toast.LENGTH_SHORT).show();
-                } else if (rate_night.getRating() == 0){
-                    Toast.makeText(RatingActivity.this, R.string.rate_pls_rate_night, Toast.LENGTH_SHORT).show();
-                } else if (ratedAlready == true){
+                if (!participantsLastGamenight.contains(auth.getUid())){
                     AlertDialog.Builder builder = new AlertDialog.Builder(RatingActivity.this);
-                    builder.setCancelable(true);
-                    builder.setTitle(R.string.rate_change_rating_title);
-                    if (TextUtils.isEmpty(rate_msg.getText())){
-                        builder.setMessage(getText(R.string.change_rate_last_gamenight_msg) + " " + String.valueOf(rate_meal.getRating()) + "/ " + String.valueOf(rate_night.getRating() + "?"));
-                    } else {
-                        builder.setMessage(getText(R.string.change_rate_last_gamenight_msg) + " " + String.valueOf(rate_meal.getRating()) + "/ " + String.valueOf(rate_night.getRating() + ", " + getText(R.string.rate_user_comment) +": " + rate_msg.getText() + "?"));
-                    }
-                    builder.setPositiveButton(R.string.discard_yes, new DialogInterface.OnClickListener() {
+                    builder.setTitle(R.string.user_didnt_take_part);
+                    builder.setMessage(R.string.rate_cannot_rate);
+                    builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
-                            rating.put("name", name);
-                            rating.put("meal rating", rate_meal.getRating());
-                            rating.put("gamenight rating", rate_night.getRating());
-                            if (!TextUtils.isEmpty(rate_msg.getText())) {
-                                String adjustedComment = rate_msg.getText().toString().replaceAll("(?m)^[ \t]*\r?\n", "");
-                                rating.put("comment", adjustedComment);
-                            }
-                            ref.child(auth.getUid()).setValue(rating).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    if (task.isSuccessful()) {
-                                        Toast.makeText(RatingActivity.this, R.string.rate_rating_changed, Toast.LENGTH_SHORT).show();
-                                        rating.clear();
-                                    }
-                                }
-                            });
-                            rate_meal.setRating(0);
-                            rate_night.setRating(0);
-                            rate_msg.setText(null);
                         }
                     });
-
                     AlertDialog dialog = builder.create();
                     dialog.show();
-
                 } else {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(RatingActivity.this);
-                    builder.setCancelable(true);
-                    builder.setTitle(R.string.rate_last_gamenight_title);
-                    if (TextUtils.isEmpty(rate_msg.getText())){
-                        builder.setMessage(getText(R.string.rate_last_gamenight_msg) + " " + String.valueOf(rate_meal.getRating()) + "/ " + String.valueOf(rate_night.getRating()) + ")");
-                    } else {
-                        builder.setMessage(getText(R.string.rate_last_gamenight_msg) + " " + String.valueOf(rate_meal.getRating()) + "/ " + String.valueOf(rate_night.getRating() + ", " + getText(R.string.rate_user_comment) +": " + rate_msg.getText()) + ")");
-                    }
-                    builder.setPositiveButton(R.string.discard_yes, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            rating.put("name", name);
-                            rating.put("meal rating", rate_meal.getRating());
-                            rating.put("gamenight rating", rate_night.getRating());
-                            if (!TextUtils.isEmpty(rate_msg.getText())) {
-                                String adjustedComment = rate_msg.getText().toString().replaceAll("(?m)^[ \t]*\r?\n", "");
-                                rating.put("comment", adjustedComment);
-                            }
-
-                            ref.child(auth.getUid()).setValue(rating).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    if(task.isSuccessful()){
-                                        Toast.makeText(RatingActivity.this, R.string.rate_rating_success, Toast.LENGTH_SHORT).show();
-                                        rating.clear();
-                                    }
+                    if (rate_meal.getRating() == 0){
+                        Toast.makeText(RatingActivity.this, R.string.rate_pls_rate_meal, Toast.LENGTH_SHORT).show();
+                    } else if (rate_night.getRating() == 0){
+                        Toast.makeText(RatingActivity.this, R.string.rate_pls_rate_night, Toast.LENGTH_SHORT).show();
+                    } else if (ratedAlready == true){
+                        AlertDialog.Builder builder = new AlertDialog.Builder(RatingActivity.this);
+                        builder.setCancelable(true);
+                        builder.setTitle(R.string.rate_change_rating_title);
+                        if (TextUtils.isEmpty(rate_msg.getText())){
+                            builder.setMessage(getText(R.string.change_rate_last_gamenight_msg) + " " + String.valueOf(rate_meal.getRating()) + "/ " + String.valueOf(rate_night.getRating() + "?"));
+                        } else {
+                            builder.setMessage(getText(R.string.change_rate_last_gamenight_msg) + " " + String.valueOf(rate_meal.getRating()) + "/ " + String.valueOf(rate_night.getRating() + ", " + getText(R.string.rate_user_comment) +": " + rate_msg.getText() + "?"));
+                        }
+                        builder.setPositiveButton(R.string.discard_yes, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                rating.put("name", name);
+                                rating.put("meal rating", rate_meal.getRating());
+                                rating.put("gamenight rating", rate_night.getRating());
+                                if (!TextUtils.isEmpty(rate_msg.getText())) {
+                                    String adjustedComment = rate_msg.getText().toString().replaceAll("(?m)^[ \t]*\r?\n", "");
+                                    rating.put("comment", adjustedComment);
                                 }
-                            });
-                            rate_meal.setRating(0);
-                            rate_night.setRating(0);
-                            rate_msg.setText(null);
+                                ref.child(auth.getUid()).setValue(rating).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        if (task.isSuccessful()) {
+                                            Toast.makeText(RatingActivity.this, R.string.rate_rating_changed, Toast.LENGTH_SHORT).show();
+                                            rating.clear();
+                                        }
+                                    }
+                                });
+                                rate_meal.setRating(0);
+                                rate_night.setRating(0);
+                                rate_msg.setText(null);
+                            }
+                        });
+
+                        AlertDialog dialog = builder.create();
+                        dialog.show();
+
+                    } else {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(RatingActivity.this);
+                        builder.setCancelable(true);
+                        builder.setTitle(R.string.rate_last_gamenight_title);
+                        if (TextUtils.isEmpty(rate_msg.getText())){
+                            builder.setMessage(getText(R.string.rate_last_gamenight_msg) + " " + String.valueOf(rate_meal.getRating()) + "/ " + String.valueOf(rate_night.getRating()) + ")");
+                        } else {
+                            builder.setMessage(getText(R.string.rate_last_gamenight_msg) + " " + String.valueOf(rate_meal.getRating()) + "/ " + String.valueOf(rate_night.getRating() + ", " + getText(R.string.rate_user_comment) +": " + rate_msg.getText()) + ")");
                         }
-                    });
+                        builder.setPositiveButton(R.string.discard_yes, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                rating.put("name", name);
+                                rating.put("meal rating", rate_meal.getRating());
+                                rating.put("gamenight rating", rate_night.getRating());
+                                if (!TextUtils.isEmpty(rate_msg.getText())) {
+                                    String adjustedComment = rate_msg.getText().toString().replaceAll("(?m)^[ \t]*\r?\n", "");
+                                    rating.put("comment", adjustedComment);
+                                }
 
-                    builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                        }
-                    });
+                                ref.child(auth.getUid()).setValue(rating).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        if(task.isSuccessful()){
+                                            Toast.makeText(RatingActivity.this, R.string.rate_rating_success, Toast.LENGTH_SHORT).show();
+                                            rating.clear();
+                                        }
+                                    }
+                                });
+                                rate_meal.setRating(0);
+                                rate_night.setRating(0);
+                                rate_msg.setText(null);
+                            }
+                        });
 
-                    AlertDialog dialog = builder.create();
-                    dialog.show();
+                        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                            }
+                        });
 
+                        AlertDialog dialog = builder.create();
+                        dialog.show();
+
+                    }
                 }
+
             }
         });
     }

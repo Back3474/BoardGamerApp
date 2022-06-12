@@ -13,7 +13,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,7 +26,6 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 
@@ -39,7 +37,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
     private MenuItem acc, logout, mngmnt;
     private TextView day, time, host, address, greetText, allParticipants, nextMeeting, notTakingPart, lateParticipantsLabel, lateParticipants;
     private LocalDate inputDate;
-    private String date, userLatetime_txt;
+    private String date, userLatetime_txt, allAdmins;
     private int hour, minute;
     private HashMap<String, Object> participants;
 
@@ -77,11 +75,40 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         lateParticipantsLabel = findViewById(R.id.late_time_label);
         lateParticipants = findViewById(R.id.late_participants);
         userLatetime_txt = null;
+        allAdmins = null;
 
         lateParticipants.setVisibility(View.GONE);
         lateParticipantsLabel.setVisibility(View.GONE);
 
+        DatabaseReference refUser = db.getReference("users");
+        DatabaseReference refLastGamenight = db.getReference("last gamenight");
+        DatabaseReference refParticipants = db.getReference("next meeting/participants");
         DatabaseReference ref = db.getReference("next meeting/");
+        DatabaseReference ref1 = db.getReference("users/"+auth.getUid());
+
+        refUser.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                allAdmins = null;
+                for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                    Boolean isAdmin = dataSnapshot.child("isAdmin").getValue(Boolean.class);
+                    String name = dataSnapshot.child("firstname").getValue().toString() + " " + dataSnapshot.child("lastname").getValue().toString();
+                    if(isAdmin){
+                        if(allAdmins == null){
+                            allAdmins = name;
+                        } else {
+                            allAdmins = allAdmins + ", " + name;
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -98,6 +125,8 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                 if(!snapshot.child("participants").hasChild(auth.getUid())){
                     notTakingPart.setText(R.string.user_not_taking_part);
                     notTakingPart.setTextColor(Color.RED);
+                } else {
+                    notTakingPart.setText(null);
                 }
             }
 
@@ -107,11 +136,12 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
             }
         });
 
-        DatabaseReference refParticipants = db.getReference("next meeting/participants");
         refParticipants.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 participants.clear();
+                allParticipants.setText(null);
+                lateParticipants.setText(null);
                 for(DataSnapshot dataSnapshot : snapshot.getChildren()){
                     String uid = dataSnapshot.getKey().toString();
                     String name = dataSnapshot.child("name").getValue().toString();
@@ -124,19 +154,24 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                     }
                     allParticipants.setText(newAllParticipants);
                     if(dataSnapshot.hasChild("latetime")){
-                        lateParticipantsLabel.setVisibility(View.VISIBLE);
-                        lateParticipants.setVisibility(View.VISIBLE);
-                        userLatetime_txt = String.valueOf(dataSnapshot.child("latetime").getValue(Integer.class));
-                        if(TextUtils.isEmpty(lateParticipants.getText())){
-                            lateParticipants.setText(name + ": " + userLatetime_txt + " min");
-                        } else {
-                            lateParticipants.setText(lateParticipants.getText().toString() + ", " + name + ": " + userLatetime_txt + " min");
+                        if(dataSnapshot.child("latetime").getValue(Integer.class) != 0){
+                            userLatetime_txt = String.valueOf(dataSnapshot.child("latetime").getValue(Integer.class));
+                            if(TextUtils.isEmpty(lateParticipants.getText())){
+                                lateParticipants.setText(name + ": " + userLatetime_txt + " " + getText(R.string.late_late_participants_min));
+                            } else {
+                                lateParticipants.setText(lateParticipants.getText().toString() + ", " + name + ": " + userLatetime_txt + " " + getText(R.string.late_late_participants_min));
+                            }
                         }
                     }
 
                 }
                 if(participants.isEmpty()){
-                    allParticipants.setText(null);
+                    allParticipants.setText(R.string.main_canceled);
+                    allParticipants.setTextColor(Color.RED);
+                }
+                if(!TextUtils.isEmpty(lateParticipants.getText())){
+                    lateParticipantsLabel.setVisibility(View.VISIBLE);
+                    lateParticipants.setVisibility(View.VISIBLE);
                 }
             }
 
@@ -146,7 +181,6 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
             }
         });
 
-        DatabaseReference ref1 = db.getReference("users/"+auth.getUid().toString());
         ref1.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -212,8 +246,22 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         games.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(MainActivity.this, GamesActivity.class));
-                finish();
+                refParticipants.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if(!snapshot.hasChild(auth.getUid())){
+                            Toast.makeText(MainActivity.this, R.string.user_not_taking_part, Toast.LENGTH_SHORT).show();
+                        } else {
+                            startActivity(new Intent(MainActivity.this, GamesActivity.class));
+                            finish();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
             }
         });
 
@@ -227,8 +275,22 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         late.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(MainActivity.this, LateActivity.class));
-                finish();
+                refParticipants.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if(!snapshot.hasChild(auth.getUid())){
+                            Toast.makeText(MainActivity.this, R.string.user_not_taking_part, Toast.LENGTH_SHORT).show();
+                        } else {
+                            startActivity(new Intent(MainActivity.this, LateActivity.class));
+                            finish();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
             }
         });
 
@@ -293,7 +355,17 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                             startActivity(new Intent(MainActivity.this, ManagementActivity.class));
                             finish();
                         } else {
-                            Toast.makeText(MainActivity.this, R.string.notAdmin, Toast.LENGTH_SHORT).show();
+                            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                            builder.setTitle(R.string.main_contact_admin_label);
+                            builder.setMessage(getText(R.string.main_contact_admin_msg).toString() +"\r\n" + allAdmins);
+                            builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+
+                                }
+                            });
+                            AlertDialog dialog = builder.create();
+                            dialog.show();
                         }
                     }
 

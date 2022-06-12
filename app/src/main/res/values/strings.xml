@@ -42,14 +42,20 @@
     <string name="main_lateBtn">I´m going to be late!</string>
     <string name="main_ratingBtn">rate last gamenight</string>
     <string name="main_cannot_take_part_msg">Are you sure you don\'t want to participate?</string>
+    <string name="main_canceled">Gamenight canceled!</string>
     <string name="meal_rate">how would you rate the meal?</string>
     <string name="gameNight_rate">how would you rate the gamenight overall?</string>
     <string name="main_cannotTakePart">I cannot take part!</string>
     <string name="main_games">games for next gamenight</string>
     <string name="main_edit_btn">edit meeting</string>
+    <string name="rate_cannot_rate">Sorry, but you cannot rate the last gamenight! You didn\'t take part!</string>
     <string name="main_late_time_label">late arrival</string>
-    <string name="user_not_taking_part">(You are not taking part!)</string>
+    <string name="main_contact_admin_label">Please contact an admin!</string>
+    <string name="main_contact_admin_msg">Only admins can manage the App Settings!"\n"If you have some recommendations please contact an admin!"\n"admin(s):</string>
+    <string name="user_not_taking_part_label_msg">(You are not taking part!)</string>
     <string name="user_not_taking_part_already">You are not taking part already!</string>
+    <string name="user_not_taking_part">You are not taking part!</string>
+    <string name="user_didnt_take_part">You didn\'t take part!</string>
     <string name="rate_msg">do you want to tell something to the host?</string>
     <string name="rate_send">send message</string>
     <string name="myAccountData">my account</string>
@@ -204,6 +210,10 @@
     <string name="late_time_custom_time_msg2">minutes?</string>
     <string name="late_time_custom_time_msg_change1">Do you want to change your latetime to</string>
     <string name="late_time_custom_time_msg_change2">minutes?</string>
+    <string name="late_late_participants_min">min</string>
+    <string name="appointment_enter_new_date">enter new date (yyyy-MM-dd)</string>
+    <string name="appointment_confirm_changes">confrim changes</string>
+    <string name="appointment_cancel">cancel</string>
 
     <string name="mon">Monday</string>
     <string name="tue">Tuesday</string>
