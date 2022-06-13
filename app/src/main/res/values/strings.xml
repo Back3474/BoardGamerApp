@@ -10,6 +10,7 @@
     <string name="regis_email">email</string>
     <string name="regis_password">password</string>
     <string name="regis_password_conf">password confirmation</string>
+    <string name="regis_invalid_password">Invalid password! Password must contain at least 1 digit, 1 uppercase letter and 1 lowercase letter!</string>
     <string name="regis_address">address (street &amp; number, code &amp; city)</string>
     <string name="regis_data">please enter your data:</string>
     <string name="regis_data_pers">personal data:</string>
@@ -95,6 +96,7 @@
     <string name="mngmnt_day">day</string>
     <string name="mngmnt_time">time</string>
     <string name="mngmnt_select_user_admin">select a user</string>
+    <string name="mngmnt_select_day">select day</string>
     <string name="mngmnt_select_user_admin_toast">Please select a user!</string>
     <string name="mngmnt_user_deactivate_title">Deactivate user account</string>
     <string name="mngmnt_user_deactivate_msg">Are you sure you want to deactivate this users account?</string>
@@ -126,7 +128,8 @@
     <string name="check_entries">Please check your entries!</string>
     <string name="confirm_your_password">Please confirm your password!</string>
     <string name="confirm_your_password_failed">Password confirmation failed!</string>
-    <string name="password_too_short">Password too short! Minimum 8 digits!</string>
+    <string name="password_too_short">Password too short! Minimum 8 characters!</string>
+    <string name="password_too_long">Password too long! Maximum 20 characters!</string>
     <string name="regis_successfull">Registration successfull!</string>
     <string name="regis_failed">Registration failed!</string>
     <string name="enter_curr_pass">Please enter your current password!</string>
@@ -214,6 +217,14 @@
     <string name="appointment_enter_new_date">enter new date (yyyy-MM-dd)</string>
     <string name="appointment_confirm_changes">confrim changes</string>
     <string name="appointment_cancel">cancel</string>
+    <string name="appointment_enter_new_address">enter new address (street &amp; number, code &amp; city)</string>
+    <string name="appointment_meeting_canceled_label">This meeting has been canceled!</string>
+    <string name="appointment_confirm_meeting_changes_title">Confirm Changes</string>
+    <string name="appointment_confirm_meeting_changes_msg">Do you want to confirm your changes?</string>
+    <string name="appointment_change_meeting_details_title">Change Appointment</string>
+    <string name="appointment_change_meeting_details_msg">Do you want to make changes to the meeting details?</string>
+    <string name="appointment_select_time">select time</string>
+    <string name="appointment_select_date">select date</string>
 
     <string name="mon">Monday</string>
     <string name="tue">Tuesday</string>

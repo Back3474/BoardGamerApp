@@ -27,8 +27,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -219,7 +217,7 @@ public class ManagementActivity extends AppCompatActivity {
         saveChangedAppointmentBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                TextView dayItem = findViewById(R.id.test);
+                TextView dayItem = findViewById(R.id.day_spinner_item);
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(ManagementActivity.this);
                 builder.setCancelable(true);
@@ -232,6 +230,7 @@ public class ManagementActivity extends AppCompatActivity {
                                 ref1.child("day").setValue(dayItem.getText().toString());
                                 ref1.child("hour").setValue(hour);
                                 ref1.child("minute").setValue(minute);
+                                dayItem.setText("test");
                             }
                         });
                 builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {

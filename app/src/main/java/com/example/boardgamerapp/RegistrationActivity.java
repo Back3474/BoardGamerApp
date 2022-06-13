@@ -54,7 +54,7 @@ public class RegistrationActivity extends AppCompatActivity {
         passConf = findViewById(R.id.regis_password_conf);
         save = findViewById(R.id.regis_save_btn);
         auth = FirebaseAuth.getInstance();
-        db = FirebaseDatabase.getInstance();
+        db = FirebaseDatabase.getInstance("https://board-gamer-app-ff958-default-rtdb.firebaseio.com");
 
         save.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -66,6 +66,8 @@ public class RegistrationActivity extends AppCompatActivity {
                 String txt_password = pass.getText().toString();
                 String txt_passwordConf = passConf.getText().toString();
 
+
+
                 if (TextUtils.isEmpty(txt_email) || TextUtils.isEmpty(txt_password) || TextUtils.isEmpty(txt_fn) || TextUtils.isEmpty(txt_ln) || TextUtils.isEmpty(txt_adr)){
                     Toast.makeText(RegistrationActivity.this, R.string.check_entries, Toast.LENGTH_SHORT).show();
                 } else if (TextUtils.isEmpty(txt_passwordConf)) {
@@ -74,6 +76,10 @@ public class RegistrationActivity extends AppCompatActivity {
                     Toast.makeText(RegistrationActivity.this, R.string.confirm_your_password_failed, Toast.LENGTH_SHORT).show();
                 } else if (txt_password.length() < 8) {
                     Toast.makeText(RegistrationActivity.this, R.string.password_too_short, Toast.LENGTH_SHORT).show();
+                } else if (txt_password.length() > 20) {
+                    Toast.makeText(RegistrationActivity.this, R.string.password_too_long, Toast.LENGTH_SHORT).show();
+                } else if (!passwordValidates(txt_password)) {
+                    Toast.makeText(RegistrationActivity.this, R.string.regis_invalid_password, Toast.LENGTH_LONG).show();
                 } else {
                     registerUser(txt_email, txt_password, txt_fn, txt_ln, txt_adr);
                 }
@@ -88,7 +94,6 @@ public class RegistrationActivity extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()){
-                    DatabaseReference manage = db.getReference("user management");
                     DatabaseReference ref = db.getReference("users/"+auth.getUid().toString());
                     Map<String, Object> user = new HashMap<>();
                     user.put("firstname", fn);
@@ -109,6 +114,19 @@ public class RegistrationActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    public boolean passwordValidates(String pass) {
+        int count = 0;
+
+        if(pass.matches(".*\\d.*"))
+            count ++;
+        if(pass.matches(".*[a-z].*"))
+            count ++;
+        if(pass.matches(".*[A-Z].*"))
+            count ++;
+
+        return count == 3;
     }
 
     @Override

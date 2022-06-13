@@ -83,8 +83,8 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         DatabaseReference refUser = db.getReference("users");
         DatabaseReference refLastGamenight = db.getReference("last gamenight");
         DatabaseReference refParticipants = db.getReference("next meeting/participants");
-        DatabaseReference ref = db.getReference("next meeting/");
-        DatabaseReference ref1 = db.getReference("users/"+auth.getUid());
+        DatabaseReference refNextMeeting = db.getReference("next meeting");
+        DatabaseReference refCurrentUser = db.getReference("users/"+auth.getUid());
 
         refUser.addValueEventListener(new ValueEventListener() {
             @Override
@@ -109,7 +109,8 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
             }
         });
 
-        ref.addValueEventListener(new ValueEventListener() {
+
+        refNextMeeting.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 date = snapshot.child("date").getValue().toString();
@@ -122,11 +123,18 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                 time.setText(String.format(Locale.getDefault(), "%02d:%02d", hour, minute));
                 host.setText(snapshot.child("host").getValue().toString());
                 address.setText(snapshot.child("address").getValue().toString());
-                if(!snapshot.child("participants").hasChild(auth.getUid())){
-                    notTakingPart.setText(R.string.user_not_taking_part);
+
+                Boolean meetingCanceled = snapshot.child("isCanceled").getValue(Boolean.class);
+                if(meetingCanceled){
+                    notTakingPart.setText(R.string.appointment_meeting_canceled_label);
                     notTakingPart.setTextColor(Color.RED);
                 } else {
-                    notTakingPart.setText(null);
+                    if(!snapshot.child("participants").hasChild(auth.getUid())){
+                        notTakingPart.setText(R.string.user_not_taking_part);
+                        notTakingPart.setTextColor(Color.RED);
+                    } else {
+                        notTakingPart.setText(null);
+                    }
                 }
             }
 
@@ -181,7 +189,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
             }
         });
 
-        ref1.addValueEventListener(new ValueEventListener() {
+        refCurrentUser.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 greetText.setText(getText(R.string.greetText) +" "+ snapshot.child("firstname").getValue().toString()+"!");

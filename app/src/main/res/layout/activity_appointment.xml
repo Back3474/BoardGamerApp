@@ -72,30 +72,43 @@
                     android:textSize="24sp"
                     android:textStyle="bold" />
 
-                <EditText
-                    android:id="@+id/meeting_nxt_mtng_day_edit"
-                    android:layout_width="match_parent"
+                <Button
+                    android:id="@+id/meeting_nxt_mtng_date_btn"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:gravity="center_horizontal"
-                    android:hint="@string/appointment_enter_new_date"
-                    android:minHeight="48dp" />
+                    android:layout_gravity="center_horizontal"
+                    android:text="@string/appointment_select_date" />
 
             </ViewSwitcher>
 
 
-
-            <TextView
-                android:id="@+id/meeting_nxt_mtng_time"
-                android:layout_width="match_parent"
+            <ViewSwitcher
+                android:id="@+id/timeViewSwitcher"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginTop="5dp"
-                android:layout_marginEnd="10dp"
-                android:layout_marginBottom="5dp"
-                android:gravity="center_horizontal"
-                android:text="@string/meeting_nxt_mtng_time"
-                android:textSize="24sp"
-                android:textStyle="bold" />
+                android:layout_width="match_parent">
+
+                <TextView
+                    android:id="@+id/meeting_nxt_mtng_time"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginBottom="5dp"
+                    android:gravity="center_horizontal"
+                    android:text="@string/meeting_nxt_mtng_time"
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
+
+                <Button
+                    android:id="@+id/meeting_nxt_mtng_time_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:text="@string/appointment_select_time" />
+
+            </ViewSwitcher>
+
 
             <TextView
                 android:id="@+id/label_meeting_nxt_mtng_host"
@@ -132,18 +145,51 @@
                 android:text="@string/label_meeting_nxt_mtng_address"
                 android:textSize="20sp" />
 
-            <TextView
-                android:id="@+id/meeting_nxt_mtng_address"
+            <ViewSwitcher
+                android:id="@+id/addressViewSwitcher"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginTop="5dp"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/meeting_nxt_mtng_address"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:gravity="center_horizontal"
+                    android:text="@string/label_meeting_nxt_mtng_address"
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:id="@+id/meeting_nxt_mtng_address_edit"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginEnd="15dp"
+                    android:gravity="center_horizontal"
+                    android:hint="@string/appointment_enter_new_address"
+                    android:minHeight="48dp" />
+
+            </ViewSwitcher>
+
+
+
+            <ImageButton
+                android:id="@+id/confirmMeetingChangesBtn"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_gravity="end"
                 android:layout_marginEnd="10dp"
                 android:layout_marginBottom="10dp"
-                android:gravity="center_horizontal"
-                android:text="@string/label_meeting_nxt_mtng_address"
-                android:textSize="24sp"
-                android:textStyle="bold" />
+                android:alpha="0.5"
+                android:background="#0000"
+                android:contentDescription="@string/late_check"
+                android:scaleType="fitCenter"
+                android:visibility="gone"
+                app:srcCompat="@drawable/check" />
 
         </LinearLayout>
 
