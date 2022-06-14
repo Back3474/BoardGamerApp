@@ -117,7 +117,9 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                 inputDate = LocalDate.parse(date);
                 DateTimeFormatter dtf = DateTimeFormatter.ofPattern(getText(R.string.date_format).toString());
                 String date1 = inputDate.format(dtf);
-                day.setText(date1);
+                String dayOfWeek = snapshot.child("day").getValue().toString();
+                int id = getResources().getIdentifier(dayOfWeek, "string", "com.example.boardgamerapp");
+                day.setText(date1 + "\n" + "(" + getText(id) + ")");
                 hour = snapshot.child("hour").getValue(Integer.class);
                 minute = snapshot.child("minute").getValue(Integer.class);
                 time.setText(String.format(Locale.getDefault(), "%02d:%02d", hour, minute));

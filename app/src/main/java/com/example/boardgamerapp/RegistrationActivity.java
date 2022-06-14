@@ -24,6 +24,8 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class RegistrationActivity extends AppCompatActivity {
     private EditText fn;
@@ -72,6 +74,8 @@ public class RegistrationActivity extends AppCompatActivity {
                     Toast.makeText(RegistrationActivity.this, R.string.check_entries, Toast.LENGTH_SHORT).show();
                 } else if (TextUtils.isEmpty(txt_passwordConf)) {
                     Toast.makeText(RegistrationActivity.this, R.string.confirm_your_password, Toast.LENGTH_SHORT).show();
+                } else if (!addressValidates(txt_adr)) {
+                    Toast.makeText(RegistrationActivity.this, R.string.regis_invalid_address, Toast.LENGTH_SHORT).show();
                 } else if (!txt_password.equals(txt_passwordConf)) {
                     Toast.makeText(RegistrationActivity.this, R.string.confirm_your_password_failed, Toast.LENGTH_SHORT).show();
                 } else if (txt_password.length() < 8) {
@@ -81,7 +85,24 @@ public class RegistrationActivity extends AppCompatActivity {
                 } else if (!passwordValidates(txt_password)) {
                     Toast.makeText(RegistrationActivity.this, R.string.regis_invalid_password, Toast.LENGTH_LONG).show();
                 } else {
-                    registerUser(txt_email, txt_password, txt_fn, txt_ln, txt_adr);
+                    AlertDialog.Builder builder = new AlertDialog.Builder(RegistrationActivity.this);
+                    builder.setCancelable(true);
+                    builder.setTitle(R.string.regis_registration_title);
+                    builder.setMessage(getText(R.string.regis_check_regis_data) + "\n" + "\n" + txt_fn + txt_ln + "\n" + txt_email + "\n" + txt_adr + "\n" + "\n" + getText(R.string.regis_check_regis_data_continue));
+                    builder.setPositiveButton(R.string.discard_yes, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            registerUser(txt_email, txt_password, txt_fn, txt_ln, txt_adr);
+                        }
+                    });
+                    builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+
+                        }
+                    });
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
                 }
             }
         });
@@ -89,12 +110,19 @@ public class RegistrationActivity extends AppCompatActivity {
 
     }
 
+    private boolean addressValidates(String txt_adr) {
+        Pattern pattern = Pattern.compile("[\\w]+\\.?\\s[\\w]+,\\s[\\w]+\\s[\\w]+");
+        Matcher matcher = pattern.matcher(txt_adr);
+        return matcher.matches();
+    }
+
     private void registerUser(String email, String password, String fn, String ln, String adr) {
         auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(RegistrationActivity.this, new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()){
-                    DatabaseReference ref = db.getReference("users/"+auth.getUid().toString());
+                    auth.signInWithEmailAndPassword(email, password);
+                    DatabaseReference ref = db.getReference("users/"+auth.getUid());
                     Map<String, Object> user = new HashMap<>();
                     user.put("firstname", fn);
                     user.put("lastname", ln);
@@ -103,6 +131,7 @@ public class RegistrationActivity extends AppCompatActivity {
                     user.put("status", "regular");
                     user.put("id", auth.getUid().toString());
                     user.put("isAdmin", false);
+                    user.put("isHost", false);
 
                     ref.setValue(user);
 

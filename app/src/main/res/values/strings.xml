@@ -131,7 +131,11 @@
     <string name="password_too_short">Password too short! Minimum 8 characters!</string>
     <string name="password_too_long">Password too long! Maximum 20 characters!</string>
     <string name="regis_successfull">Registration successfull!</string>
-    <string name="regis_failed">Registration failed!</string>
+    <string name="regis_failed">Registration failed! Please try again!</string>
+    <string name="regis_invalid_address">Invalid address!</string>
+    <string name="regis_registration_title">Registration</string>
+    <string name="regis_check_regis_data">Check your registration data:</string>
+    <string name="regis_check_regis_data_continue">Continue?</string>
     <string name="enter_curr_pass">Please enter your current password!</string>
     <string name="enter_new_pass">Please enter a new password!</string>
     <string name="pass_change_success">Password changed successfully!</string>
@@ -225,6 +229,14 @@
     <string name="appointment_change_meeting_details_msg">Do you want to make changes to the meeting details?</string>
     <string name="appointment_select_time">select time</string>
     <string name="appointment_select_date">select date</string>
+    <string name="appointment_select_date_future">Please select a date in the future!</string>
+    <string name="appointment_invalid_address">Invalid address!</string>
+    <string name="appointment_generate_new_meeting">Generate new meeting</string>
+    <string name="appointment_cancel_meeting_title">Cancel Meeting</string>
+    <string name="appointment_cancel_meeting_msg">You are about to cancel the next meeting! Are you sure?</string>
+    <string name="appointment_cancel_success">Meeting canceled successfully!</string>
+    <string name="appointment_confirm_meeting_end_title">Confirm End of Meeting</string>
+    <string name="appointment_confirm_meeting_end_msg">You are about to confirm the end of this meeting. A new meeting will be generated automatically. "\n"As you will not be the host anymore, you will be redirected to the Startscreen. "\n" "\n"Continue?</string>
 
     <string name="mon">Monday</string>
     <string name="tue">Tuesday</string>

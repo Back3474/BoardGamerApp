@@ -20,8 +20,11 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -29,10 +32,15 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.sql.Date;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class AppointmentActivity extends AppCompatActivity {
     private FirebaseDatabase db;
@@ -84,6 +92,7 @@ public class AppointmentActivity extends AppCompatActivity {
         db = FirebaseDatabase.getInstance("https://board-gamer-app-ff958-default-rtdb.firebaseio.com");
 
         DatabaseReference refNextMeeting = db.getReference("next meeting");
+        DatabaseReference refUsers = db.getReference("users");
 
         refNextMeeting.addValueEventListener(new ValueEventListener() {
             @Override
@@ -92,19 +101,109 @@ public class AppointmentActivity extends AppCompatActivity {
                 inputDate = LocalDate.parse(date);
                 DateTimeFormatter dtf = DateTimeFormatter.ofPattern(getText(R.string.date_format).toString());
                 String date1 = inputDate.format(dtf);
-                nxtMeetingDay.setText(date1);
+                String dayOfWeek = snapshot.child("day").getValue().toString();
+                int id = getResources().getIdentifier(dayOfWeek, "string", "com.example.boardgamerapp");
+                nxtMeetingDay.setText(date1 + "\n" + "(" + getText(id) + ")");
                 hour = snapshot.child("hour").getValue(Integer.class);
                 minute = snapshot.child("minute").getValue(Integer.class);
                 nxtMeetingTime.setText(String.format(Locale.getDefault(), "%02d:%02d", hour, minute));
                 nxtMeetingHost.setText(snapshot.child("host").getValue().toString());
                 nxtMeetingAddress.setText(snapshot.child("address").getValue().toString());
 
+                View.OnClickListener generateNewMeetingOnClickListener = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+
+                    }
+                };
+                View.OnClickListener confirmMeetingEndOnClickListener = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(AppointmentActivity.this);
+                        builder.setCancelable(true);
+                        builder.setTitle(R.string.appointment_confirm_meeting_end_title);
+                        builder.setMessage(R.string.appointment_confirm_meeting_end_msg);
+                        builder.setPositiveButton(R.string.discard_yes, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                refUsers.addValueEventListener(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                        Map users = new HashMap<String, Object>();
+                                        for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                                        }
+                                        DatabaseReference ref = db.getReference("users/"+auth.getUid());
+                                        ref.child("isHost").setValue(false);
+
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError error) {
+
+                                    }
+                                });
+                            }
+                        });
+                        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+
+                            }
+                        });
+                        AlertDialog dialog = builder.create();
+                        dialog.show();
+                    }
+                };
+
                 meetingCanceled = snapshot.child("isCanceled").getValue(Boolean.class);
                 if(meetingCanceled){
                     meetingIsCanceled.setText(R.string.appointment_meeting_canceled_label);
                     meetingIsCanceled.setTextColor(Color.RED);
+                    cancelMeetingBtn.setClickable(false);
+                    cancelMeetingBtn.setAlpha(0.3f);
+                    editMeetingBtn.setClickable(false);
+                    editMeetingBtn.setAlpha(0.3f);
+                    confirmMeetingEndBtn.setText(R.string.appointment_generate_new_meeting);
+                    confirmMeetingEndBtn.setOnClickListener(generateNewMeetingOnClickListener);
                 } else {
                     meetingIsCanceled.setText(null);
+                    cancelMeetingBtn.setClickable(true);
+                    cancelMeetingBtn.setAlpha(1f);
+                    editMeetingBtn.setClickable(true);
+                    editMeetingBtn.setAlpha(1f);
+                    confirmMeetingEndBtn.setText(R.string.meeting_confirm_mtng_end_btn);
+                    confirmMeetingEndBtn.setOnClickListener(confirmMeetingEndOnClickListener);
+                    cancelMeetingBtn.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(AppointmentActivity.this);
+                            builder.setCancelable(true);
+                            builder.setTitle(R.string.appointment_cancel_meeting_title);
+                            builder.setMessage(R.string.appointment_cancel_meeting_msg);
+                            builder.setPositiveButton(R.string.discard_yes, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    refNextMeeting.child("isCanceled").setValue(true).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            if(task.isSuccessful()){
+                                                cancelMeetingBtn.setClickable(false);
+                                                Toast.makeText(AppointmentActivity.this, R.string.appointment_cancel_success, Toast.LENGTH_SHORT).show();
+                                            }
+                                        }
+                                    });
+                                }
+                            });
+                            builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+
+                                }
+                            });
+                            AlertDialog dialog = builder.create();
+                            dialog.show();
+                        }
+                    });
                 }
             }
 
@@ -153,47 +252,7 @@ public class AppointmentActivity extends AppCompatActivity {
 
                                 @Override
                                 public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                                    confirmChanges.setAlpha(1.0f);
-                                    if(!confirmChanges.hasOnClickListeners()){
-                                        confirmChanges.setOnClickListener(new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View view) {
-                                                AlertDialog.Builder builder = new AlertDialog.Builder(AppointmentActivity.this);
-                                                builder.setTitle(R.string.appointment_confirm_meeting_changes_title);
-                                                builder.setMessage(R.string.appointment_confirm_meeting_changes_msg);
-                                                builder.setCancelable(true);
-                                                builder.setPositiveButton(R.string.discard_yes, new DialogInterface.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(DialogInterface dialogInterface, int i) {
-                                                        // WORK WORK WORK
-                                                        hostLabel.setVisibility(View.VISIBLE);
-                                                        nxtMeetingHost.setVisibility(View.VISIBLE);
-                                                        viewSwitcherDay.showPrevious();
-                                                        viewSwitcherTime.showPrevious();
-                                                        viewSwitcherAddress.showPrevious();
-                                                        clickedForEdit = false;
-                                                        editMeetingBtn.setText(R.string.meeting_edit_mtng_btn);
-                                                        confirmChanges.setVisibility(View.GONE);
-                                                        selectDateBtn.setText(null);
-                                                        editAddress.setText(null);
-                                                        selectTimeBtn.setText(R.string.appointment_select_time);
-                                                        cancelMeetingBtn.setAlpha(1f);
-                                                        cancelMeetingBtn.setClickable(true);
-                                                        confirmMeetingEndBtn.setAlpha(1f);
-                                                        confirmMeetingEndBtn.setClickable(true);
-                                                    }
-                                                });
-                                                builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(DialogInterface dialogInterface, int i) {
-
-                                                    }
-                                                });
-                                                AlertDialog dialog = builder.create();
-                                                dialog.show();
-                                            }
-                                        });
-                                    }
+                                    confrimAllChanges();
                                 }
 
                                 @Override
@@ -213,46 +272,7 @@ public class AppointmentActivity extends AppCompatActivity {
                                         confirmChanges.setAlpha(0.3f);
                                         confirmChanges.setOnClickListener(null);
                                     } else {
-                                        confirmChanges.setAlpha(1.0f);
-                                        if(!confirmChanges.hasOnClickListeners()){
-                                            confirmChanges.setOnClickListener(new View.OnClickListener() {
-                                                @Override
-                                                public void onClick(View view) {
-                                                    AlertDialog.Builder builder = new AlertDialog.Builder(AppointmentActivity.this);
-                                                    builder.setTitle(R.string.appointment_confirm_meeting_changes_title);
-                                                    builder.setMessage(R.string.appointment_confirm_meeting_changes_msg);
-                                                    builder.setCancelable(true);
-                                                    builder.setPositiveButton(R.string.discard_yes, new DialogInterface.OnClickListener() {
-                                                        @Override
-                                                        public void onClick(DialogInterface dialogInterface, int i) {
-                                                            hostLabel.setVisibility(View.VISIBLE);
-                                                            nxtMeetingHost.setVisibility(View.VISIBLE);
-                                                            viewSwitcherDay.showPrevious();
-                                                            viewSwitcherTime.showPrevious();
-                                                            viewSwitcherAddress.showPrevious();
-                                                            clickedForEdit = false;
-                                                            editMeetingBtn.setText(R.string.meeting_edit_mtng_btn);
-                                                            confirmChanges.setVisibility(View.GONE);
-                                                            selectDateBtn.setText(R.string.appointment_select_date);
-                                                            editAddress.setText(null);
-                                                            selectTimeBtn.setText(R.string.appointment_select_time);
-                                                            cancelMeetingBtn.setAlpha(1f);
-                                                            cancelMeetingBtn.setClickable(true);
-                                                            confirmMeetingEndBtn.setAlpha(1f);
-                                                            confirmMeetingEndBtn.setClickable(true);
-                                                        }
-                                                    });
-                                                    builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                                                        @Override
-                                                        public void onClick(DialogInterface dialogInterface, int i) {
-
-                                                        }
-                                                    });
-                                                    AlertDialog dialog = builder.create();
-                                                    dialog.show();
-                                                }
-                                            });
-                                        }
+                                        confrimAllChanges();
                                     }
                                 }
 
@@ -276,47 +296,7 @@ public class AppointmentActivity extends AppCompatActivity {
 
                                 @Override
                                 public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                                    confirmChanges.setAlpha(1.0f);
-                                    if(!confirmChanges.hasOnClickListeners()){
-                                        confirmChanges.setOnClickListener(new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View view) {
-                                                AlertDialog.Builder builder = new AlertDialog.Builder(AppointmentActivity.this);
-                                                builder.setTitle(R.string.appointment_confirm_meeting_changes_title);
-                                                builder.setMessage(R.string.appointment_confirm_meeting_changes_msg);
-                                                builder.setCancelable(true);
-                                                builder.setPositiveButton(R.string.discard_yes, new DialogInterface.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(DialogInterface dialogInterface, int i) {
-                                                        hostLabel.setVisibility(View.VISIBLE);
-                                                        nxtMeetingHost.setVisibility(View.VISIBLE);
-                                                        viewSwitcherDay.showPrevious();
-                                                        viewSwitcherTime.showPrevious();
-                                                        viewSwitcherAddress.showPrevious();
-                                                        clickedForEdit = false;
-                                                        editMeetingBtn.setText(R.string.meeting_edit_mtng_btn);
-                                                        confirmChanges.setVisibility(View.GONE);
-                                                        selectDateBtn.setText(R.string.appointment_select_date);
-                                                        editAddress.setText(null);
-                                                        selectTimeBtn.setText(R.string.appointment_select_time);
-                                                        cancelMeetingBtn.setAlpha(1f);
-                                                        cancelMeetingBtn.setClickable(true);
-                                                        confirmMeetingEndBtn.setAlpha(1f);
-                                                        confirmMeetingEndBtn.setClickable(true);
-                                                    }
-                                                });
-                                                builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(DialogInterface dialogInterface, int i) {
-
-                                                    }
-                                                });
-                                                AlertDialog dialog = builder.create();
-                                                dialog.show();
-                                            }
-                                        });
-                                    }
-
+                                    confrimAllChanges();
                                 }
 
                                 @Override
@@ -387,10 +367,146 @@ public class AppointmentActivity extends AppCompatActivity {
         });
     }
 
+    private void confrimAllChanges() {
+        confirmChanges.setAlpha(1.0f);
+        if(!confirmChanges.hasOnClickListeners()){
+            confirmChanges.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(AppointmentActivity.this);
+                    builder.setTitle(R.string.appointment_confirm_meeting_changes_title);
+                    builder.setMessage(R.string.appointment_confirm_meeting_changes_msg);
+                    builder.setCancelable(true);
+                    builder.setPositiveButton(R.string.discard_yes, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            int year = datePickerDialog.getDatePicker().getYear();
+                            int month = datePickerDialog.getDatePicker().getMonth();
+                            month = month + 1;
+                            int day = datePickerDialog.getDatePicker().getDayOfMonth();
+                            LocalDate newLocalDate = LocalDate.of(year, month, day);
+                            String newDate = String.format(Locale.getDefault(), "%04d-%02d-%02d", year, month, day);
+                            String dayOfWeek = LocalDate.parse(newDate).getDayOfWeek().name().toString();
+                            if(dayOfWeek == "MONDAY"){
+                                dayOfWeek = "mon";
+                            }
+                            if(dayOfWeek == "TUESDAY"){
+                                dayOfWeek = "tue";
+                            }
+                            if(dayOfWeek == "WEDNESDAY"){
+                                dayOfWeek = "wed";
+                            }
+                            if(dayOfWeek == "THURSDAY"){
+                                dayOfWeek = "thu";
+                            }
+                            if(dayOfWeek == "FRIDAY"){
+                                dayOfWeek = "fri";
+                            }
+                            if(dayOfWeek == "SATURDAY"){
+                                dayOfWeek = "sat";
+                            }
+                            if(dayOfWeek == "SUNDAY"){
+                                dayOfWeek = "sun";
+                            }
+
+                            int newHour = hour;
+                            int newMinute = minute;
+
+                            String newAddress = editAddress.getText().toString();
+
+                            DatabaseReference ref = db.getReference("next meeting");
+                            Map newMeeting = new HashMap<String, Object>();
+
+                            newMeeting.clear();
+                            if(!selectDateBtn.getText().equals(R.string.appointment_select_date)){
+                                newMeeting.put("date", newDate);
+                                newMeeting.put("day", dayOfWeek);
+                            }
+                            if(!selectTimeBtn.getText().equals(R.string.appointment_select_time)){
+                                newMeeting.put("hour", newHour);
+                                newMeeting.put("minute", newMinute);
+                            }
+                            if(!TextUtils.isEmpty(editAddress.getText())){
+                                if(!addressValidates(newAddress)){
+                                    Toast.makeText(AppointmentActivity.this, R.string.appointment_invalid_address, Toast.LENGTH_SHORT).show();
+                                } else {
+                                    newMeeting.put("address", newAddress);
+                                    ref.updateChildren(newMeeting).addOnCompleteListener(new OnCompleteListener() {
+                                        @Override
+                                        public void onComplete(@NonNull Task task) {
+                                            if(task.isSuccessful()){
+                                                hostLabel.setVisibility(View.VISIBLE);
+                                                nxtMeetingHost.setVisibility(View.VISIBLE);
+                                                viewSwitcherDay.showPrevious();
+                                                viewSwitcherTime.showPrevious();
+                                                viewSwitcherAddress.showPrevious();
+                                                clickedForEdit = false;
+                                                editMeetingBtn.setText(R.string.meeting_edit_mtng_btn);
+                                                confirmChanges.setVisibility(View.GONE);
+                                                selectDateBtn.setText(R.string.appointment_select_date);
+                                                editAddress.setText(null);
+                                                selectTimeBtn.setText(R.string.appointment_select_time);
+                                                cancelMeetingBtn.setAlpha(1f);
+                                                cancelMeetingBtn.setClickable(true);
+                                                confirmMeetingEndBtn.setAlpha(1f);
+                                                confirmMeetingEndBtn.setClickable(true);
+                                            } else {
+                                                Toast.makeText(AppointmentActivity.this, "failed", Toast.LENGTH_SHORT).show();
+                                            }
+                                        }
+                                    });
+                                }
+                            } else {
+                                ref.updateChildren(newMeeting).addOnCompleteListener(new OnCompleteListener() {
+                                    @Override
+                                    public void onComplete(@NonNull Task task) {
+                                        if(task.isSuccessful()){
+                                            hostLabel.setVisibility(View.VISIBLE);
+                                            nxtMeetingHost.setVisibility(View.VISIBLE);
+                                            viewSwitcherDay.showPrevious();
+                                            viewSwitcherTime.showPrevious();
+                                            viewSwitcherAddress.showPrevious();
+                                            clickedForEdit = false;
+                                            editMeetingBtn.setText(R.string.meeting_edit_mtng_btn);
+                                            confirmChanges.setVisibility(View.GONE);
+                                            selectDateBtn.setText(R.string.appointment_select_date);
+                                            editAddress.setText(null);
+                                            selectTimeBtn.setText(R.string.appointment_select_time);
+                                            cancelMeetingBtn.setAlpha(1f);
+                                            cancelMeetingBtn.setClickable(true);
+                                            confirmMeetingEndBtn.setAlpha(1f);
+                                            confirmMeetingEndBtn.setClickable(true);
+                                        } else {
+                                            Toast.makeText(AppointmentActivity.this, "failed", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                    });
+                    builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                        }
+                    });
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
+                }
+            });
+        }
+    }
+
+    private boolean addressValidates(String txt_adr) {
+        Pattern pattern = Pattern.compile("[\\w]+\\.?\\s[\\w]+,\\s[\\w]+\\s[\\w]+");
+        Matcher matcher = pattern.matcher(txt_adr);
+        return matcher.matches();
+    }
+
     private void initDatePicker() {
         DatePickerDialog.OnDateSetListener dateSetListener = new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker datePicker, int year, int month, int day) {
+                month = month + 1;
                 String date = makeDateString(day, month, year);
                 selectDateBtn.setText(date);
             }
