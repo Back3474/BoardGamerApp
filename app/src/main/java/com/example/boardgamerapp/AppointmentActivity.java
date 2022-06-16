@@ -1,5 +1,9 @@
 package com.example.boardgamerapp;
 
+import static java.time.DayOfWeek.MONDAY;
+import static java.util.Calendar.SUNDAY;
+import static java.util.Calendar.WEDNESDAY;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -33,9 +37,15 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.sql.Date;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.Temporal;
+import java.time.temporal.TemporalAdjuster;
+import java.time.temporal.TemporalAdjusters;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -53,9 +63,9 @@ public class AppointmentActivity extends AppCompatActivity {
     private ViewSwitcher viewSwitcherDay, viewSwitcherTime, viewSwitcherAddress;
     private ImageButton confirmChanges;
     private EditText editAddress;
-    private int hour, minute, nextMtngHour, nextMtngMinute;
-    private String date;
-    private LocalDate inputDate;
+    private int hour, minute, nextMtngHour, nextMtngMinute, appointmentDefHour, appointmentDefMinute;
+    private String date, appointmentDefDay, defDayShort;
+    private LocalDate inputDate, nextMeetingDate;
     private DatePickerDialog datePickerDialog;
 
     @Override
@@ -93,6 +103,29 @@ public class AppointmentActivity extends AppCompatActivity {
 
         DatabaseReference refNextMeeting = db.getReference("next meeting");
         DatabaseReference refUsers = db.getReference("users");
+        DatabaseReference refLastGamenight = db.getReference("last gamenight");
+        DatabaseReference refDefAppointment = db.getReference("default periodic appointment");
+
+        refDefAppointment.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                appointmentDefDay = snapshot.child("day").getValue().toString();
+                defDayShort = makeDefDayShort(appointmentDefDay);
+                appointmentDefHour = snapshot.child("hour").getValue(Integer.class);
+                appointmentDefMinute = snapshot.child("minute").getValue(Integer.class);
+                int dayOfWeek = getDayOfWeek(appointmentDefDay);
+                nextMeetingDate = today.with(TemporalAdjusters.next(DayOfWeek.of(dayOfWeek)));
+
+                if(today.compareTo(nextMeetingDate) > -5){
+                    nextMeetingDate = nextMeetingDate.with(TemporalAdjusters.next(DayOfWeek.of(dayOfWeek)));
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
 
         refNextMeeting.addValueEventListener(new ValueEventListener() {
             @Override
@@ -126,20 +159,64 @@ public class AppointmentActivity extends AppCompatActivity {
                         builder.setPositiveButton(R.string.discard_yes, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                refUsers.addValueEventListener(new ValueEventListener() {
+                                refNextMeeting.addValueEventListener(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                        Map users = new HashMap<String, Object>();
-                                        for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                                        Map lastMtngParticipants = new HashMap<String, String>();
+                                        for(DataSnapshot dataSnapshot : snapshot.child("participants").getChildren()){
+                                            String uid = dataSnapshot.getKey();
+                                            String name = dataSnapshot.child("name").getValue().toString();
+                                            lastMtngParticipants.put(uid, name);
                                         }
-                                        DatabaseReference ref = db.getReference("users/"+auth.getUid());
-                                        ref.child("isHost").setValue(false);
-
+                                        refLastGamenight.child("participants").setValue(lastMtngParticipants);
+                                        refLastGamenight.child("ratings").removeValue();
                                     }
 
                                     @Override
                                     public void onCancelled(@NonNull DatabaseError error) {
 
+                                    }
+                                });
+                                refUsers.addValueEventListener(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                        ArrayList users = new ArrayList<String>();
+                                        for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                                            String userUid = dataSnapshot.child("id").getValue().toString();
+                                            String userName = dataSnapshot.child("firstname").getValue().toString() + " " + dataSnapshot.child("lastname").getValue().toString();
+                                            refNextMeeting.child("participants").child(userUid).child("name").setValue(userName);
+                                            refNextMeeting.child("participants").child(userUid).child("latetime").removeValue();
+                                            users.add(userUid);
+                                        }
+                                        Collections.sort(users);
+                                        int currentHostIndex = users.indexOf(auth.getUid());
+                                        String newHost = users.get(currentHostIndex + 1).toString();
+
+                                        refUsers.child(newHost).child("isHost").setValue(true);
+                                        refNextMeeting.child("host").setValue(snapshot.child(newHost).child("firstname").getValue().toString() + " " + snapshot.child(newHost).child("lastname").getValue().toString());
+                                        refNextMeeting.child("address").setValue(snapshot.child(newHost).child("address").getValue().toString());
+
+                                        refNextMeeting.child("votes").removeValue();
+                                        refNextMeeting.child("games").removeValue();
+                                        refNextMeeting.child("isCanceled").setValue(false);
+
+                                        refNextMeeting.child("hour").setValue(appointmentDefHour);
+                                        refNextMeeting.child("minute").setValue(appointmentDefMinute);
+                                        refNextMeeting.child("day").setValue(defDayShort);
+                                        refNextMeeting.child("date").setValue(nextMeetingDate.toString());
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError error) {
+
+                                    }
+                                });
+                                refUsers.child(auth.getUid()).child("isHost").setValue(false).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        if(task.isSuccessful()){
+                                            startActivity(new Intent(AppointmentActivity.this, MainActivity.class));
+                                        }
                                     }
                                 });
                             }
@@ -365,6 +442,40 @@ public class AppointmentActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    private int getDayOfWeek(String appointmentDefDay) {
+        int dayOfWeek = 0;
+        if(appointmentDefDay.equals("Monday")){
+            dayOfWeek = 1;
+        }
+        if(appointmentDefDay.equals("Tuesday")){
+            dayOfWeek = 2;
+        }
+        if(appointmentDefDay.equals("Wednesday")){
+            dayOfWeek = 3;
+        }
+        if(appointmentDefDay.equals("Thursday")){
+            dayOfWeek = 4;
+        }
+        if(appointmentDefDay.equals("Friday")){
+            dayOfWeek = 5;
+        }
+        if(appointmentDefDay.equals("Saturday")){
+            dayOfWeek = 6;
+        }
+        if(appointmentDefDay.equals("Sunday")){
+            dayOfWeek = 7;
+        }
+        return dayOfWeek;
+    }
+
+    private String makeDefDayShort(String appointmentDefDay) {
+        String defDayShort = appointmentDefDay.substring(0, 3);
+        char c[] = defDayShort.toCharArray();
+        c[0] = Character.toLowerCase(c[0]);
+        defDayShort = new String(c);
+        return defDayShort;
     }
 
     private void confrimAllChanges() {

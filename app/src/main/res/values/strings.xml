@@ -237,6 +237,9 @@
     <string name="appointment_cancel_success">Meeting canceled successfully!</string>
     <string name="appointment_confirm_meeting_end_title">Confirm End of Meeting</string>
     <string name="appointment_confirm_meeting_end_msg">You are about to confirm the end of this meeting. A new meeting will be generated automatically. "\n"As you will not be the host anymore, you will be redirected to the Startscreen. "\n" "\n"Continue?</string>
+    <string name="main_cannot_take_part_host">You can\'t do this! Your are the host!</string>
+    <string name="main_late_host_title">Attention</string>
+    <string name="main_late_host_msg">You can\'t do this! You are the host!"\n"If you want to change the meeting time, please go to the meeting editting screen."\n\n"Redirect to meeting editting screen?</string>
 
     <string name="mon">Monday</string>
     <string name="tue">Tuesday</string>

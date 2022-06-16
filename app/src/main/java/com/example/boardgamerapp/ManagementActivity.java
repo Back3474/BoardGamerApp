@@ -230,7 +230,8 @@ public class ManagementActivity extends AppCompatActivity {
                                 ref1.child("day").setValue(dayItem.getText().toString());
                                 ref1.child("hour").setValue(hour);
                                 ref1.child("minute").setValue(minute);
-                                dayItem.setText("test");
+                                dayItem.setText(R.string.mngmnt_select_day);
+                                timeButton.setText(R.string.mngmnt_selectTime);
                             }
                         });
                 builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {

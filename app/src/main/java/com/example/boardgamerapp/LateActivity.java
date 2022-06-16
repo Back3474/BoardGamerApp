@@ -74,6 +74,7 @@ public class LateActivity extends AppCompatActivity {
                                                 public void onComplete(@NonNull Task<Void> task) {
                                                     if(task.isSuccessful()){
                                                         Toast.makeText(LateActivity.this, R.string.late_time_changed_to_5_min, Toast.LENGTH_SHORT).show();
+                                                        startActivity(new Intent(LateActivity.this, MainActivity.class));
                                                     }
                                                 }
                                             });
@@ -101,6 +102,7 @@ public class LateActivity extends AppCompatActivity {
                                             public void onComplete(@NonNull Task<Void> task) {
                                                 if(task.isSuccessful()){
                                                     Toast.makeText(LateActivity.this, R.string.late_time_set_to_5_min, Toast.LENGTH_SHORT).show();
+                                                    startActivity(new Intent(LateActivity.this, MainActivity.class));
                                                 }
                                             }
                                         });
@@ -137,6 +139,7 @@ public class LateActivity extends AppCompatActivity {
                                                 public void onComplete(@NonNull Task<Void> task) {
                                                     if(task.isSuccessful()){
                                                         Toast.makeText(LateActivity.this, R.string.late_time_changed_to_15_min, Toast.LENGTH_SHORT).show();
+                                                        startActivity(new Intent(LateActivity.this, MainActivity.class));
                                                     }
                                                 }
                                             });
@@ -164,6 +167,7 @@ public class LateActivity extends AppCompatActivity {
                                             public void onComplete(@NonNull Task<Void> task) {
                                                 if(task.isSuccessful()){
                                                     Toast.makeText(LateActivity.this, R.string.late_time_set_to_15_min, Toast.LENGTH_SHORT).show();
+                                                    startActivity(new Intent(LateActivity.this, MainActivity.class));
                                                 }
                                             }
                                         });
@@ -200,6 +204,7 @@ public class LateActivity extends AppCompatActivity {
                                                 public void onComplete(@NonNull Task<Void> task) {
                                                     if(task.isSuccessful()){
                                                         Toast.makeText(LateActivity.this, R.string.late_time_changed_to_30_min, Toast.LENGTH_SHORT).show();
+                                                        startActivity(new Intent(LateActivity.this, MainActivity.class));
                                                     }
                                                 }
                                             });
@@ -227,6 +232,7 @@ public class LateActivity extends AppCompatActivity {
                                             public void onComplete(@NonNull Task<Void> task) {
                                                 if(task.isSuccessful()){
                                                     Toast.makeText(LateActivity.this, R.string.late_time_set_to_30_min, Toast.LENGTH_SHORT).show();
+                                                    startActivity(new Intent(LateActivity.this, MainActivity.class));
                                                 }
                                             }
                                         });
@@ -271,6 +277,7 @@ public class LateActivity extends AppCompatActivity {
                                                         if(task.isSuccessful()){
                                                             custom_time.setText(null);
                                                             Toast.makeText(LateActivity.this, getText(R.string.late_time_changed_to_custom_time1).toString() + " " + customLatetime + " " + getText(R.string.late_time_changed_to_custom_time2).toString(), Toast.LENGTH_SHORT).show();
+                                                            startActivity(new Intent(LateActivity.this, MainActivity.class));
                                                         }
                                                     }
                                                 });
@@ -299,6 +306,7 @@ public class LateActivity extends AppCompatActivity {
                                                     if(task.isSuccessful()){
                                                         custom_time.setText(null);
                                                         Toast.makeText(LateActivity.this, getText(R.string.late_time_set_to_custom_time1).toString() + " " + customLatetime + " " + getText(R.string.late_time_set_to_custom_time2).toString(), Toast.LENGTH_SHORT).show();
+                                                        startActivity(new Intent(LateActivity.this, MainActivity.class));
                                                     }
                                                 }
                                             });

@@ -40,6 +40,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
     private String date, userLatetime_txt, allAdmins;
     private int hour, minute;
     private HashMap<String, Object> participants;
+    private Boolean meetingCanceled, isHost;
 
 
 
@@ -126,7 +127,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                 host.setText(snapshot.child("host").getValue().toString());
                 address.setText(snapshot.child("address").getValue().toString());
 
-                Boolean meetingCanceled = snapshot.child("isCanceled").getValue(Boolean.class);
+                meetingCanceled = snapshot.child("isCanceled").getValue(Boolean.class);
                 if(meetingCanceled){
                     notTakingPart.setText(R.string.appointment_meeting_canceled_label);
                     notTakingPart.setTextColor(Color.RED);
@@ -195,7 +196,8 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 greetText.setText(getText(R.string.greetText) +" "+ snapshot.child("firstname").getValue().toString()+"!");
-                if(snapshot.child("isHost").getValue(Boolean.class) == false ){
+                isHost = snapshot.child("isHost").getValue(Boolean.class);
+                if(isHost == false ){
                     editMeetingBtn.setVisibility(View.GONE);
                 }
             }
@@ -212,8 +214,12 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                 refParticipants.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if(!snapshot.hasChild(auth.getUid())){
+                        if(isHost){
+                            Toast.makeText(MainActivity.this, R.string.main_cannot_take_part_host, Toast.LENGTH_SHORT).show();
+                        }else if(!snapshot.hasChild(auth.getUid())){
                             Toast.makeText(MainActivity.this, R.string.user_not_taking_part_already, Toast.LENGTH_SHORT).show();
+                        } else if(meetingCanceled){
+                            Toast.makeText(MainActivity.this, R.string.appointment_meeting_canceled_label, Toast.LENGTH_SHORT).show();
                         } else {
                             AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                             builder.setCancelable(true);
@@ -288,8 +294,29 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                 refParticipants.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if(!snapshot.hasChild(auth.getUid())){
+                        if(isHost){
+                            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                            builder.setCancelable(true);
+                            builder.setTitle(R.string.main_late_host_title);
+                            builder.setMessage(R.string.main_late_host_msg);
+                            builder.setPositiveButton(R.string.discard_yes, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    startActivity(new Intent(MainActivity.this, AppointmentActivity.class));
+                                }
+                            });
+                            builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+
+                                }
+                            });
+                            AlertDialog dialog = builder.create();
+                            dialog.show();
+                        } else if(!snapshot.hasChild(auth.getUid())){
                             Toast.makeText(MainActivity.this, R.string.user_not_taking_part, Toast.LENGTH_SHORT).show();
+                        } else if(meetingCanceled){
+                            Toast.makeText(MainActivity.this, R.string.appointment_meeting_canceled_label, Toast.LENGTH_SHORT).show();
                         } else {
                             startActivity(new Intent(MainActivity.this, LateActivity.class));
                             finish();
