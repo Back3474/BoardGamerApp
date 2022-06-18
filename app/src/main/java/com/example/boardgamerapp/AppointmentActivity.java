@@ -1,6 +1,7 @@
 package com.example.boardgamerapp;
 
 import static java.time.DayOfWeek.MONDAY;
+import static java.time.temporal.ChronoUnit.DAYS;
 import static java.util.Calendar.SUNDAY;
 import static java.util.Calendar.WEDNESDAY;
 
@@ -39,6 +40,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.sql.Date;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.Temporal;
 import java.time.temporal.TemporalAdjuster;
@@ -113,12 +115,7 @@ public class AppointmentActivity extends AppCompatActivity {
                 defDayShort = makeDefDayShort(appointmentDefDay);
                 appointmentDefHour = snapshot.child("hour").getValue(Integer.class);
                 appointmentDefMinute = snapshot.child("minute").getValue(Integer.class);
-                int dayOfWeek = getDayOfWeek(appointmentDefDay);
-                nextMeetingDate = today.with(TemporalAdjusters.next(DayOfWeek.of(dayOfWeek)));
 
-                if(today.compareTo(nextMeetingDate) > -5){
-                    nextMeetingDate = nextMeetingDate.with(TemporalAdjusters.next(DayOfWeek.of(dayOfWeek)));
-                }
             }
 
             @Override
@@ -146,53 +143,42 @@ public class AppointmentActivity extends AppCompatActivity {
                 View.OnClickListener generateNewMeetingOnClickListener = new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-
-                    }
-                };
-                View.OnClickListener confirmMeetingEndOnClickListener = new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
                         AlertDialog.Builder builder = new AlertDialog.Builder(AppointmentActivity.this);
                         builder.setCancelable(true);
-                        builder.setTitle(R.string.appointment_confirm_meeting_end_title);
-                        builder.setMessage(R.string.appointment_confirm_meeting_end_msg);
+                        builder.setTitle(R.string.appointment_generate_new_meeting_title);
+                        builder.setMessage(R.string.appointment_generate_new_meeting_msg);
                         builder.setPositiveButton(R.string.discard_yes, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                refNextMeeting.addValueEventListener(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                        Map lastMtngParticipants = new HashMap<String, String>();
-                                        for(DataSnapshot dataSnapshot : snapshot.child("participants").getChildren()){
-                                            String uid = dataSnapshot.getKey();
-                                            String name = dataSnapshot.child("name").getValue().toString();
-                                            lastMtngParticipants.put(uid, name);
-                                        }
-                                        refLastGamenight.child("participants").setValue(lastMtngParticipants);
-                                        refLastGamenight.child("ratings").removeValue();
-                                    }
-
-                                    @Override
-                                    public void onCancelled(@NonNull DatabaseError error) {
-
-                                    }
-                                });
                                 refUsers.addValueEventListener(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                                         ArrayList users = new ArrayList<String>();
-                                        for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                                        refNextMeeting.child("participants").removeValue();
+                                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                                             String userUid = dataSnapshot.child("id").getValue().toString();
                                             String userName = dataSnapshot.child("firstname").getValue().toString() + " " + dataSnapshot.child("lastname").getValue().toString();
                                             refNextMeeting.child("participants").child(userUid).child("name").setValue(userName);
                                             refNextMeeting.child("participants").child(userUid).child("latetime").removeValue();
                                             users.add(userUid);
                                         }
-                                        Collections.sort(users);
+                                        Collections.sort(users, String.CASE_INSENSITIVE_ORDER);
                                         int currentHostIndex = users.indexOf(auth.getUid());
-                                        String newHost = users.get(currentHostIndex + 1).toString();
+                                        String newHost;
+                                        if (currentHostIndex + 1 == users.size()) {
+                                            newHost = users.get(0).toString();
+                                            refUsers.child(newHost).child("isHost").setValue(true);
+                                        } else {
+                                            newHost = users.get(currentHostIndex + 1).toString();
+                                            refUsers.child(newHost).child("isHost").setValue(true);
+                                        }
 
-                                        refUsers.child(newHost).child("isHost").setValue(true);
+                                        int dayOfWeek = getDayOfWeek(appointmentDefDay);
+                                        nextMeetingDate = inputDate.with(TemporalAdjusters.next(DayOfWeek.of(dayOfWeek)));
+                                        if(DAYS.between(inputDate, nextMeetingDate) < 5){
+                                            nextMeetingDate = nextMeetingDate.with(TemporalAdjusters.next(DayOfWeek.of(dayOfWeek)));
+                                        }
+
                                         refNextMeeting.child("host").setValue(snapshot.child(newHost).child("firstname").getValue().toString() + " " + snapshot.child(newHost).child("lastname").getValue().toString());
                                         refNextMeeting.child("address").setValue(snapshot.child(newHost).child("address").getValue().toString());
 
@@ -214,7 +200,7 @@ public class AppointmentActivity extends AppCompatActivity {
                                 refUsers.child(auth.getUid()).child("isHost").setValue(false).addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override
                                     public void onComplete(@NonNull Task<Void> task) {
-                                        if(task.isSuccessful()){
+                                        if (task.isSuccessful()) {
                                             startActivity(new Intent(AppointmentActivity.this, MainActivity.class));
                                         }
                                     }
@@ -229,6 +215,112 @@ public class AppointmentActivity extends AppCompatActivity {
                         });
                         AlertDialog dialog = builder.create();
                         dialog.show();
+                    }
+                };
+                View.OnClickListener confirmMeetingEndOnClickListener = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        date = snapshot.child("date").getValue().toString();
+                        inputDate = LocalDate.parse(date);
+
+                        if (DAYS.between(today, inputDate) > 0) {
+                            Toast.makeText(AppointmentActivity.this, R.string.appointment_confrim_end_error, Toast.LENGTH_LONG).show();
+                        } else {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(AppointmentActivity.this);
+                            builder.setCancelable(true);
+                            builder.setTitle(R.string.appointment_confirm_meeting_end_title);
+                            builder.setMessage(R.string.appointment_confirm_meeting_end_msg);
+                            builder.setPositiveButton(R.string.discard_yes, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    refNextMeeting.addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                            Map lastMtngParticipants = new HashMap<String, String>();
+                                            for (DataSnapshot dataSnapshot : snapshot.child("participants").getChildren()) {
+                                                String uid = dataSnapshot.getKey();
+                                                String name = dataSnapshot.child("name").getValue().toString();
+                                                lastMtngParticipants.put(uid, name);
+                                            }
+                                            refLastGamenight.child("participants").removeValue();
+                                            refLastGamenight.child("participants").setValue(lastMtngParticipants);
+                                            refLastGamenight.child("ratings").removeValue();
+                                            refLastGamenight.child("date").setValue(snapshot.child("date").getValue().toString());
+                                            refLastGamenight.child("host").setValue(snapshot.child("host").getValue().toString());
+                                            refLastGamenight.child("hostId").setValue(auth.getUid());
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError error) {
+
+                                        }
+                                    });
+                                    refUsers.addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                            ArrayList users = new ArrayList<String>();
+                                            refNextMeeting.child("participants").removeValue();
+                                            for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                                                String userUid = dataSnapshot.child("id").getValue().toString();
+                                                String userName = dataSnapshot.child("firstname").getValue().toString() + " " + dataSnapshot.child("lastname").getValue().toString();
+                                                refNextMeeting.child("participants").child(userUid).child("name").setValue(userName);
+                                                refNextMeeting.child("participants").child(userUid).child("latetime").removeValue();
+                                                users.add(userUid);
+                                            }
+                                            Collections.sort(users, String.CASE_INSENSITIVE_ORDER);
+                                            int currentHostIndex = users.indexOf(auth.getUid());
+                                            String newHost;
+                                            if (currentHostIndex + 1 == users.size()) {
+                                                newHost = users.get(0).toString();
+                                                refUsers.child(newHost).child("isHost").setValue(true);
+                                            } else {
+                                                newHost = users.get(currentHostIndex + 1).toString();
+                                                refUsers.child(newHost).child("isHost").setValue(true);
+                                            }
+
+                                            int dayOfWeek = getDayOfWeek(appointmentDefDay);
+                                            nextMeetingDate = today.with(TemporalAdjusters.next(DayOfWeek.of(dayOfWeek)));
+                                            if(DAYS.between(today, nextMeetingDate) < 5){
+                                                nextMeetingDate = nextMeetingDate.with(TemporalAdjusters.next(DayOfWeek.of(dayOfWeek)));
+                                            }
+
+                                            refNextMeeting.child("host").setValue(snapshot.child(newHost).child("firstname").getValue().toString() + " " + snapshot.child(newHost).child("lastname").getValue().toString());
+                                            refNextMeeting.child("address").setValue(snapshot.child(newHost).child("address").getValue().toString());
+
+                                            refNextMeeting.child("votes").removeValue();
+                                            refNextMeeting.child("games").removeValue();
+                                            refNextMeeting.child("isCanceled").setValue(false);
+
+                                            refNextMeeting.child("hour").setValue(appointmentDefHour);
+                                            refNextMeeting.child("minute").setValue(appointmentDefMinute);
+                                            refNextMeeting.child("day").setValue(defDayShort);
+                                            refNextMeeting.child("date").setValue(nextMeetingDate.toString());
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError error) {
+
+                                        }
+                                    });
+                                    refUsers.child(auth.getUid()).child("isHost").setValue(false).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            if (task.isSuccessful()) {
+                                                startActivity(new Intent(AppointmentActivity.this, MainActivity.class));
+                                            }
+                                        }
+                                    });
+                                }
+                            });
+                            builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+
+                                }
+                            });
+                            AlertDialog dialog = builder.create();
+                            dialog.show();
+                        }
                     }
                 };
 
@@ -260,15 +352,19 @@ public class AppointmentActivity extends AppCompatActivity {
                             builder.setPositiveButton(R.string.discard_yes, new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i) {
-                                    refNextMeeting.child("isCanceled").setValue(true).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<Void> task) {
-                                            if(task.isSuccessful()){
-                                                cancelMeetingBtn.setClickable(false);
-                                                Toast.makeText(AppointmentActivity.this, R.string.appointment_cancel_success, Toast.LENGTH_SHORT).show();
+                                    if(DAYS.between(today, inputDate) < 2){
+                                        Toast.makeText(AppointmentActivity.this, R.string.appointment_cant_be_canceled, Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        refNextMeeting.child("isCanceled").setValue(true).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                if(task.isSuccessful()){
+                                                    cancelMeetingBtn.setClickable(false);
+                                                    Toast.makeText(AppointmentActivity.this, R.string.appointment_cancel_success, Toast.LENGTH_SHORT).show();
+                                                }
                                             }
-                                        }
-                                    });
+                                        });
+                                    }
                                 }
                             });
                             builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {

@@ -19,6 +19,7 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RatingBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -32,6 +33,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjuster;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
@@ -56,6 +58,7 @@ public class RatingActivity extends AppCompatActivity {
     private Boolean ratedAlready;
     private Map<String, Object> rating;
     private String name;
+    private TextView lastGamenightDate, lastGameNightHost;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +74,8 @@ public class RatingActivity extends AppCompatActivity {
         ratingsListView = findViewById(R.id.all_ratings_list);
         ratedAlready = false;
         rating = new HashMap<>();
+        lastGamenightDate = findViewById(R.id.rating_last_gamenight_date);
+        lastGameNightHost = findViewById(R.id.rating_last_gamenight_host);
 
 
         db = FirebaseDatabase.getInstance("https://board-gamer-app-ff958-default-rtdb.firebaseio.com");
@@ -82,9 +87,27 @@ public class RatingActivity extends AppCompatActivity {
         LinearLayout allRatingsLayout = findViewById(R.id.allRatings_layout);
         allRatingsLayout.setVisibility(View.GONE);
 
-        DatabaseReference ref = db.getReference("last gamenight/ratings");
+        DatabaseReference refLastGamenight = db.getReference("last gamenight");
+        DatabaseReference refRatings = db.getReference("last gamenight/ratings");
         DatabaseReference refName = db.getReference("users/"+auth.getUid());
         DatabaseReference refParticipants = db.getReference("last gamenight/participants");
+
+        refLastGamenight.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                String lastGameNightDate_txt = snapshot.child("date").getValue().toString();
+                LocalDate lastGmNiDate = LocalDate.parse(lastGameNightDate_txt);
+                DateTimeFormatter dtf = DateTimeFormatter.ofPattern(getText(R.string.date_format).toString());
+                String formattedDate = lastGmNiDate.format(dtf);
+                lastGamenightDate.setText(formattedDate);
+                lastGameNightHost.setText(snapshot.child("host").getValue().toString());
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
 
         refParticipants.addValueEventListener(new ValueEventListener() {
             @Override
@@ -114,7 +137,7 @@ public class RatingActivity extends AppCompatActivity {
             }
         });
 
-        ref.addValueEventListener(new ValueEventListener() {
+        refRatings.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 ratedAlready = snapshot.hasChild(auth.getUid());
@@ -181,7 +204,7 @@ public class RatingActivity extends AppCompatActivity {
                                     String adjustedComment = rate_msg.getText().toString().replaceAll("(?m)^[ \t]*\r?\n", "");
                                     rating.put("comment", adjustedComment);
                                 }
-                                ref.child(auth.getUid()).setValue(rating).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                refRatings.child(auth.getUid()).setValue(rating).addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override
                                     public void onComplete(@NonNull Task<Void> task) {
                                         if (task.isSuccessful()) {
@@ -219,7 +242,7 @@ public class RatingActivity extends AppCompatActivity {
                                     rating.put("comment", adjustedComment);
                                 }
 
-                                ref.child(auth.getUid()).setValue(rating).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                refRatings.child(auth.getUid()).setValue(rating).addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override
                                     public void onComplete(@NonNull Task<Void> task) {
                                         if(task.isSuccessful()){

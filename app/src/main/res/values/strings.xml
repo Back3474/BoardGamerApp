@@ -49,7 +49,7 @@
     <string name="main_cannotTakePart">I cannot take part!</string>
     <string name="main_games">games for next gamenight</string>
     <string name="main_edit_btn">edit meeting</string>
-    <string name="rate_cannot_rate">Sorry, but you cannot rate the last gamenight! You didn\'t take part!</string>
+    <string name="rate_cannot_rate">You can\'t rate the last gamenight! You didn\'t take part!</string>
     <string name="main_late_time_label">late arrival</string>
     <string name="main_contact_admin_label">Please contact an admin!</string>
     <string name="main_contact_admin_msg">Only admins can manage the App Settings!"\n"If you have some recommendations please contact an admin!"\n"admin(s):</string>
@@ -237,9 +237,17 @@
     <string name="appointment_cancel_success">Meeting canceled successfully!</string>
     <string name="appointment_confirm_meeting_end_title">Confirm End of Meeting</string>
     <string name="appointment_confirm_meeting_end_msg">You are about to confirm the end of this meeting. A new meeting will be generated automatically. "\n"As you will not be the host anymore, you will be redirected to the Startscreen. "\n" "\n"Continue?</string>
+    <string name="appointment_generate_new_meeting_title">Generate new Meeting</string>
+    <string name="appointment_generate_new_meeting_msg">You are about to generate a new this meeting. This will be done automatically. "\n"As you will not be the host anymore, you will be redirected to the Startscreen. "\n" "\n"Continue?</string>
     <string name="main_cannot_take_part_host">You can\'t do this! Your are the host!</string>
     <string name="main_late_host_title">Attention</string>
     <string name="main_late_host_msg">You can\'t do this! You are the host!"\n"If you want to change the meeting time, please go to the meeting editting screen."\n\n"Redirect to meeting editting screen?</string>
+    <string name="appointment_confrim_end_error">The end of the meeting can only be confirmed after the meeting time!</string>
+    <string name="appointment_cant_be_canceled">The meeting can\'t be canceled within 24 hours before the meeting time!</string>
+    <string name="rating_last_gamenight_label">Last Gamenight</string>
+    <string name="rating_last_gamenight_date">Date</string>
+    <string name="rating_last_gamenight_host">Host</string>
+    <string name="login_wrong_email_or_password">Wrong email or password!</string>
 
     <string name="mon">Monday</string>
     <string name="tue">Tuesday</string>

@@ -54,10 +54,6 @@ public class LoginActivity extends AppCompatActivity {
         db = FirebaseDatabase.getInstance();
         resetPass = findViewById(R.id.resetPass);
 
-        if (auth.getCurrentUser() != null) {
-
-        }
-
 
         resetPass.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -119,7 +115,8 @@ public class LoginActivity extends AppCompatActivity {
         if(email.isEmpty() || password.isEmpty()){
             Toast.makeText(LoginActivity.this, R.string.enter_login_data, Toast.LENGTH_SHORT).show();
         } else {
-
+        findViewById(R.id.loginLayout).setVisibility(View.GONE);
+        findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
         auth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
@@ -131,11 +128,15 @@ public class LoginActivity extends AppCompatActivity {
                             statusLogin = snapshot.child("status").getValue().toString();
                             if (statusLogin.equals("deactivated")) {
                                 auth.signOut();
+                                findViewById(R.id.loginLayout).setVisibility(View.VISIBLE);
+                                findViewById(R.id.loadingPanel).setVisibility(View.GONE);
                                 Toast.makeText(LoginActivity.this, R.string.acc_deactivated, Toast.LENGTH_SHORT).show();
                             } else {
                                 Toast.makeText(LoginActivity.this, R.string.login_success, Toast.LENGTH_SHORT).show();
                                 startActivity(new Intent(LoginActivity.this, MainActivity.class));
                                 finish();
+                                findViewById(R.id.loginLayout).setVisibility(View.VISIBLE);
+                                findViewById(R.id.loadingPanel).setVisibility(View.GONE);
                             }
                         }
 
@@ -145,7 +146,9 @@ public class LoginActivity extends AppCompatActivity {
                         }
                     });
                 } else {
-                    Toast.makeText(LoginActivity.this, "wrong email or password", Toast.LENGTH_SHORT).show();
+                    findViewById(R.id.loginLayout).setVisibility(View.VISIBLE);
+                    findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+                    Toast.makeText(LoginActivity.this, R.string.login_wrong_email_or_password, Toast.LENGTH_LONG).show();
                 }
             }
         });
