@@ -12,7 +12,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
+import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -89,8 +91,20 @@ public class RatingActivity extends AppCompatActivity {
 
         DatabaseReference refLastGamenight = db.getReference("last gamenight");
         DatabaseReference refRatings = db.getReference("last gamenight/ratings");
-        DatabaseReference refName = db.getReference("users/"+auth.getUid());
+        DatabaseReference refUser = db.getReference("users/"+auth.getUid());
         DatabaseReference refParticipants = db.getReference("last gamenight/participants");
+
+        refUser.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                name = snapshot.child("firstname").getValue().toString() + " " + snapshot.child("lastname").getValue().toString();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
 
         refLastGamenight.addValueEventListener(new ValueEventListener() {
             @Override
@@ -125,39 +139,27 @@ public class RatingActivity extends AppCompatActivity {
             }
         });
 
-        refName.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                name = snapshot.child("firstname").getValue().toString() + " " + snapshot.child("lastname").getValue().toString();
-                }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-
         refRatings.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 ratedAlready = snapshot.hasChild(auth.getUid());
                 ratings.clear();
-                for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     userName = dataSnapshot.child("name").getValue().toString();
                     mealRating = dataSnapshot.child("meal rating").getValue(Integer.class);
                     nightRating = dataSnapshot.child("gamenight rating").getValue(Integer.class);
-                    if(dataSnapshot.hasChild("comment")){
+                    if (dataSnapshot.hasChild("comment")) {
                         String comment = dataSnapshot.child("comment").getValue().toString();
                         ratings.add(new Rating(userName, mealRating, nightRating, comment));
                     } else {
                         ratings.add(new Rating(userName, mealRating, nightRating));
                     }
                 }
-                if (!ratings.isEmpty()){
+                if (!ratings.isEmpty()) {
+                    ArrayAdapter ratingListAdapter = new RatingListAdapter(RatingActivity.this, ratings);
+                    ratingsListView.setAdapter(ratingListAdapter);
                     allRatingsLayout.setVisibility(View.VISIBLE);
                 }
-                ArrayAdapter ratingListAdapter = new RatingListAdapter(RatingActivity.this, ratings);
-                ratingsListView.setAdapter(ratingListAdapter);
             }
 
             @Override

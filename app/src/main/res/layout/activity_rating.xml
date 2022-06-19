@@ -7,8 +7,8 @@
     tools:context=".RatingActivity">
 
     <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:gravity="top"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -170,7 +170,7 @@
             <ListView
                 android:id="@+id/all_ratings_list"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:clickable="false"
                 android:listSelector="@android:color/transparent" />
         </LinearLayout>
@@ -184,4 +184,5 @@
             app:srcCompat="@drawable/app_icon" />
 
     </LinearLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

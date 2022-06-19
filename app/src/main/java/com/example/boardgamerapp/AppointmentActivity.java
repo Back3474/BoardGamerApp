@@ -23,6 +23,8 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -69,6 +71,8 @@ public class AppointmentActivity extends AppCompatActivity {
     private String date, appointmentDefDay, defDayShort;
     private LocalDate inputDate, nextMeetingDate;
     private DatePickerDialog datePickerDialog;
+    private LinearLayout appontmentLayout;
+    private RelativeLayout appointmentLoading;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,6 +102,9 @@ public class AppointmentActivity extends AppCompatActivity {
         selectDateBtn = viewSwitcherDay.findViewById(R.id.meeting_nxt_mtng_date_btn);
         editAddress = viewSwitcherAddress.findViewById(R.id.meeting_nxt_mtng_address_edit);
         selectTimeBtn = viewSwitcherTime.findViewById(R.id.meeting_nxt_mtng_time_btn);
+        appontmentLayout = findViewById(R.id.layoutAppointment);
+        appointmentLoading = findViewById(R.id.loadingPanelAppointment);
+        appointmentLoading.setVisibility(View.GONE);
         initDatePicker();
 
         auth = FirebaseAuth.getInstance();
@@ -150,6 +157,8 @@ public class AppointmentActivity extends AppCompatActivity {
                         builder.setPositiveButton(R.string.discard_yes, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
+                                appointmentLoading.setVisibility(View.VISIBLE);
+                                appontmentLayout.setVisibility(View.GONE);
                                 refUsers.addValueEventListener(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -202,6 +211,7 @@ public class AppointmentActivity extends AppCompatActivity {
                                     public void onComplete(@NonNull Task<Void> task) {
                                         if (task.isSuccessful()) {
                                             startActivity(new Intent(AppointmentActivity.this, MainActivity.class));
+                                            Toast.makeText(AppointmentActivity.this, R.string.appointment_new_meeting_generated, Toast.LENGTH_SHORT).show();
                                         }
                                     }
                                 });
@@ -233,6 +243,8 @@ public class AppointmentActivity extends AppCompatActivity {
                             builder.setPositiveButton(R.string.discard_yes, new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i) {
+                                    appointmentLoading.setVisibility(View.VISIBLE);
+                                    appontmentLayout.setVisibility(View.GONE);
                                     refNextMeeting.addListenerForSingleValueEvent(new ValueEventListener() {
                                         @Override
                                         public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -306,6 +318,7 @@ public class AppointmentActivity extends AppCompatActivity {
                                         @Override
                                         public void onComplete(@NonNull Task<Void> task) {
                                             if (task.isSuccessful()) {
+                                                Toast.makeText(AppointmentActivity.this, R.string.appointment_new_meeting_generated, Toast.LENGTH_SHORT).show();
                                                 startActivity(new Intent(AppointmentActivity.this, MainActivity.class));
                                             }
                                         }

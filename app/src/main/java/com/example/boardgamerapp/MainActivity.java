@@ -81,6 +81,9 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         lateParticipants.setVisibility(View.GONE);
         lateParticipantsLabel.setVisibility(View.GONE);
 
+        findViewById(R.id.loadingPanelMain).setVisibility(View.VISIBLE);
+        findViewById(R.id.linearLayoutMain).setVisibility(View.GONE);
+
         DatabaseReference refUser = db.getReference("users");
         DatabaseReference refLastGamenight = db.getReference("last gamenight");
         DatabaseReference refParticipants = db.getReference("next meeting/participants");
@@ -139,6 +142,8 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                         notTakingPart.setText(null);
                     }
                 }
+                findViewById(R.id.loadingPanelMain).setVisibility(View.GONE);
+                findViewById(R.id.linearLayoutMain).setVisibility(View.VISIBLE);
             }
 
             @Override
@@ -199,6 +204,9 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                 isHost = snapshot.child("isHost").getValue(Boolean.class);
                 if(isHost == false ){
                     editMeetingBtn.setVisibility(View.GONE);
+                }
+                if(snapshot.child("status").getValue().toString().equals("deactivated")){
+                    startActivity(new Intent(MainActivity.this, LoginActivity.class));
                 }
             }
 

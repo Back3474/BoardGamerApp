@@ -172,6 +172,10 @@ public class ManagementActivity extends AppCompatActivity {
                         userList.add(new User(userUid, userName));
                     }
                 }
+
+                if(snapshot.child(auth.getUid()).child("status").getValue().toString().equals("deactivated")){
+                    startActivity(new Intent(ManagementActivity.this, LoginActivity.class));
+                }
             }
 
             @Override

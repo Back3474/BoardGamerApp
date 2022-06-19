@@ -6,141 +6,152 @@
     android:layout_height="match_parent"
     tools:context=".DataUpdateActivity">
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <TextView
-            android:id="@+id/changeData"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:text="@string/accDatatUpdate"
-            android:textSize="24sp"
-            android:textStyle="bold" />
+        android:layout_height="0dp"
+        android:scrollbars="none"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
-            android:layout_marginBottom="10dp"
-            android:background="@drawable/border"
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/label_updateFirstname"
+                android:id="@+id/changeData"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginEnd="10dp"
-                android:text="@string/accountData_firstname"
-                android:textSize="22sp"
+                android:layout_margin="10dp"
+                android:text="@string/accDatatUpdate"
+                android:textSize="24sp"
                 android:textStyle="bold" />
 
-            <EditText
-                android:id="@+id/updateFirstname"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
-                android:gravity="center_horizontal"
-                android:hint="@string/updateFirstname"
-                android:minHeight="48dp"
-                android:textSize="20sp" />
-
-            <TextView
-                android:id="@+id/label_updateName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
-                android:text="@string/accountData_lastname"
-                android:textSize="22sp"
-                android:textStyle="bold" />
-
-            <EditText
-                android:id="@+id/updateLastname"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
-                android:gravity="center_horizontal"
-                android:hint="@string/updateLastname"
-                android:minHeight="48dp"
-                android:textSize="20sp" />
-
-            <TextView
-                android:id="@+id/label_updateEmail"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
-                android:text="@string/accountData_email"
-                android:textSize="22sp"
-                android:textStyle="bold" />
-
-            <EditText
-                android:id="@+id/updateEmail"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
-                android:gravity="center_horizontal"
-                android:hint="@string/updateEmail"
-                android:inputType="textEmailAddress"
-                android:minHeight="48dp"
-                android:textSize="20sp" />
-
-            <TextView
-                android:id="@+id/label_updateAddress"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
-                android:text="@string/accountData_address"
-                android:textSize="22sp"
-                android:textStyle="bold" />
-
-            <EditText
-                android:id="@+id/updateAddress"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
                 android:layout_marginEnd="10dp"
                 android:layout_marginBottom="10dp"
-                android:gravity="center_horizontal"
-                android:hint="@string/updateAddress"
-                android:minHeight="48dp"
-                android:textSize="20sp" />
-        </LinearLayout>
+                android:background="@drawable/border"
+                android:orientation="vertical">
 
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/label_updateFirstname"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:text="@string/accountData_firstname"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
 
-            <ImageButton
-                android:id="@+id/saveDataBtn"
+                <EditText
+                    android:id="@+id/updateFirstname"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:gravity="center_horizontal"
+                    android:hint="@string/updateFirstname"
+                    android:minHeight="48dp"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/label_updateName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:text="@string/accountData_lastname"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:id="@+id/updateLastname"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:gravity="center_horizontal"
+                    android:hint="@string/updateLastname"
+                    android:minHeight="48dp"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/label_updateEmail"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:text="@string/accountData_email"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:id="@+id/updateEmail"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:gravity="center_horizontal"
+                    android:hint="@string/updateEmail"
+                    android:inputType="textEmailAddress"
+                    android:minHeight="48dp"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/label_updateAddress"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:text="@string/accountData_address"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:id="@+id/updateAddress"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:gravity="center_horizontal"
+                    android:hint="@string/updateAddress"
+                    android:minHeight="48dp"
+                    android:textSize="20sp" />
+            </LinearLayout>
+
+            <TableRow
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginStart="5dp"
-                android:layout_marginEnd="25dp"
-                android:layout_weight="1"
-                android:background="#0000"
-                android:contentDescription="@string/saveUpdatedData"
-                android:scaleType="fitEnd"
-                android:src="@drawable/check" />
-        </TableRow>
+                android:layout_height="wrap_content">
 
-        <ImageView
-            android:id="@+id/imageView7"
-            android:layout_width="150dp"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:scaleType="fitCenter"
-            app:srcCompat="@drawable/app_icon" />
+                <ImageButton
+                    android:id="@+id/saveDataBtn"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginEnd="25dp"
+                    android:layout_weight="1"
+                    android:background="#0000"
+                    android:contentDescription="@string/saveUpdatedData"
+                    android:scaleType="fitEnd"
+                    android:src="@drawable/check" />
+            </TableRow>
 
-    </LinearLayout>
+            <ImageView
+                android:id="@+id/imageView7"
+                android:layout_width="150dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:scaleType="fitCenter"
+                app:srcCompat="@drawable/app_icon" />
+
+        </LinearLayout>
+    </ScrollView>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

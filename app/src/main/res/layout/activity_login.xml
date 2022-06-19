@@ -6,6 +6,90 @@
     android:layout_height="match_parent"
     tools:context=".LoginActivity">
 
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbars="none"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:id="@+id/loginLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="50dp"
+                android:layout_marginBottom="10dp"
+                android:scaleType="fitCenter"
+                app:srcCompat="@drawable/app_icon" />
+
+            <EditText
+                android:id="@+id/email_login"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:ems="10"
+                android:hint="@string/email_login"
+                android:inputType="text"
+                android:minHeight="48dp" />
+
+            <EditText
+                android:id="@+id/password_login"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:ems="10"
+                android:hint="@string/password_login"
+                android:inputType="textPassword"
+                android:minHeight="48dp" />
+
+            <ImageButton
+                android:id="@+id/login_loginBtn"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="10dp"
+                android:background="#0000"
+                android:contentDescription="@string/login_btn"
+                android:scaleType="fitCenter"
+                android:src="@drawable/check"
+                android:text="@string/login_btn" />
+
+            <ImageButton
+                android:id="@+id/login_regisBtn"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="10dp"
+                android:background="#0000"
+                android:contentDescription="@string/register_btn"
+                android:scaleType="fitCenter"
+                android:src="@drawable/add_user"
+                android:text="@string/register_btn" />
+
+            <TextView
+                android:id="@+id/resetPass"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:gravity="center"
+                android:minHeight="48dp"
+                android:text="@string/forgot_pass"
+                android:textSize="20sp" />
+        </LinearLayout>
+    </ScrollView>
+
     <RelativeLayout
         android:id="@+id/loadingPanel"
         android:layout_width="match_parent"
@@ -23,83 +107,5 @@
             android:layout_height="wrap_content"
             android:indeterminate="true" />
     </RelativeLayout>
-
-    <LinearLayout
-        android:id="@+id/loginLayout"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-
-        <ImageView
-            android:id="@+id/imageView"
-            android:layout_width="match_parent"
-            android:layout_height="150dp"
-            android:layout_gravity="center"
-            android:layout_marginTop="50dp"
-            android:layout_marginBottom="10dp"
-            android:scaleType="fitCenter"
-            app:srcCompat="@drawable/app_icon" />
-
-        <EditText
-            android:id="@+id/email_login"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
-            android:ems="10"
-            android:hint="@string/email_login"
-            android:inputType="text"
-            android:minHeight="48dp" />
-
-        <EditText
-            android:id="@+id/password_login"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
-            android:ems="10"
-            android:hint="@string/password_login"
-            android:inputType="textPassword"
-            android:minHeight="48dp" />
-
-        <ImageButton
-            android:id="@+id/login_loginBtn"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="10dp"
-            android:background="#0000"
-            android:contentDescription="@string/login_btn"
-            android:scaleType="fitCenter"
-            android:src="@drawable/check"
-            android:text="@string/login_btn" />
-
-        <ImageButton
-            android:id="@+id/login_regisBtn"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="10dp"
-            android:background="#0000"
-            android:contentDescription="@string/register_btn"
-            android:scaleType="fitCenter"
-            android:src="@drawable/add_user"
-            android:text="@string/register_btn" />
-
-        <TextView
-            android:id="@+id/resetPass"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:clickable="true"
-            android:gravity="center"
-            android:minHeight="48dp"
-            android:text="@string/forgot_pass"
-            android:textSize="20sp" />
-    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

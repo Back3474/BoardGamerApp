@@ -6,260 +6,269 @@
     android:layout_height="match_parent"
     tools:context=".ManagementActivity">
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
+        android:scrollbars="none"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
-            android:id="@+id/mngmnt_label"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="10dp"
-            android:text="@string/mngmnt_label"
-            android:textSize="24sp"
-            android:textStyle="bold" />
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:background="@drawable/border"
-            android:orientation="vertical"
-            android:paddingBottom="10dp">
-
-            <TextView
-                android:id="@+id/mngmnt_user"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="15dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginEnd="15dp"
-                android:text="@string/mngmnt_user"
-                android:textSize="22sp"
-                android:textStyle="bold" />
-
-            <TableRow
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <TextView
-                    android:id="@+id/choose_user"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="15dp"
-                    android:layout_marginEnd="5dp"
-                    android:layout_weight="1"
-                    android:gravity="center_vertical"
-                    android:maxHeight="48dp"
-                    android:minHeight="48dp"
-                    android:text="@string/mngmnt_chooseUser"
-                    android:textSize="20sp" />
-
-                <Spinner
-                    android:id="@+id/user_spinner"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="5dp"
-                    android:layout_marginEnd="15dp"
-                    android:layout_weight="1"
-                    android:contentDescription="@string/mngmnt_chooseUser" />
-            </TableRow>
-
-            <TableRow
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <Button
-                    android:id="@+id/adminStatus"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginEnd="5dp"
-                    android:layout_weight="1"
-                    android:text="@string/mngmnt_adminStatus" />
-
-                <Button
-                    android:id="@+id/deactivateUser"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="5dp"
-                    android:layout_marginEnd="10dp"
-                    android:layout_weight="1"
-                    android:text="@string/mngmnt_deactivateUser" />
-            </TableRow>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:background="@drawable/border"
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/mngmnt_regular_appointment_current"
+                android:id="@+id/mngmnt_label"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="15dp"
+                android:layout_marginStart="10dp"
                 android:layout_marginTop="10dp"
-                android:layout_marginEnd="15dp"
-                android:text="@string/mngmnt_current_regular_appointment"
-                android:textSize="22sp"
+                android:layout_marginEnd="10dp"
+                android:text="@string/mngmnt_label"
+                android:textSize="24sp"
                 android:textStyle="bold" />
 
-            <TableRow
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <TextView
-                    android:id="@+id/mngmnt_current_day"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="15dp"
-                    android:layout_marginEnd="5dp"
-                    android:layout_weight="1"
-                    android:gravity="center_vertical"
-                    android:minHeight="48dp"
-                    android:text="@string/mngmnt_day"
-                    android:textSize="20sp" />
-
-                <TextView
-                    android:id="@+id/mngmnt_currentDay"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="5dp"
-                    android:layout_marginEnd="15dp"
-                    android:layout_weight="1"
-                    android:gravity="center_vertical"
-                    android:minHeight="48dp"
-                    android:paddingStart="10dp"
-                    android:text="@string/sun"
-                    android:textSize="20sp" />
-            </TableRow>
-
-            <TableRow
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <TextView
-                    android:id="@+id/mngmnt_current_time"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="15dp"
-                    android:layout_marginEnd="5dp"
-                    android:layout_weight="1"
-                    android:gravity="center_vertical"
-                    android:minHeight="48dp"
-                    android:text="@string/mngmnt_time"
-                    android:textSize="20sp" />
-
-                <TextView
-                    android:id="@+id/mngmnt_currentTime"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="5dp"
-                    android:layout_marginEnd="15dp"
-                    android:layout_weight="1"
-                    android:gravity="center_vertical"
-                    android:minHeight="48dp"
-                    android:paddingStart="10dp"
-                    android:text="19:00"
-                    android:textSize="20sp" />
-            </TableRow>
-
-            <TextView
-                android:id="@+id/mngmnt_regular_appointment_default"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="15dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginEnd="15dp"
-                android:text="@string/mngmnt_default_regular_appointment"
-                android:textSize="22sp"
-                android:textStyle="bold" />
-
-            <TableRow
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_margin="10dp"
+                android:background="@drawable/border"
+                android:orientation="vertical"
+                android:paddingBottom="10dp">
 
                 <TextView
-                    android:id="@+id/mngmnt_day"
+                    android:id="@+id/mngmnt_user"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_marginStart="15dp"
-                    android:layout_marginEnd="5dp"
-                    android:layout_weight="1"
-                    android:gravity="center_vertical"
-                    android:maxHeight="48dp"
-                    android:minHeight="48dp"
-                    android:text="@string/mngmnt_day"
-                    android:textSize="20sp" />
-
-                <Spinner
-                    android:id="@+id/day_spinner"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="5dp"
+                    android:layout_marginTop="10dp"
                     android:layout_marginEnd="15dp"
-                    android:layout_weight="1"
-                    android:contentDescription="@string/mngmnt_chooseDay" />
-            </TableRow>
+                    android:text="@string/mngmnt_user"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
 
-            <TableRow
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/choose_user"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="15dp"
+                        android:layout_marginEnd="5dp"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical"
+                        android:maxHeight="48dp"
+                        android:minHeight="48dp"
+                        android:text="@string/mngmnt_chooseUser"
+                        android:textSize="20sp" />
+
+                    <Spinner
+                        android:id="@+id/user_spinner"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginEnd="15dp"
+                        android:layout_weight="1"
+                        android:contentDescription="@string/mngmnt_chooseUser" />
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <Button
+                        android:id="@+id/adminStatus"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginEnd="5dp"
+                        android:layout_weight="1"
+                        android:text="@string/mngmnt_adminStatus" />
+
+                    <Button
+                        android:id="@+id/deactivateUser"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginEnd="10dp"
+                        android:layout_weight="1"
+                        android:text="@string/mngmnt_deactivateUser" />
+                </TableRow>
+
+            </LinearLayout>
+
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:background="@drawable/border"
+                android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/mngmnt_time"
+                    android:id="@+id/mngmnt_regular_appointment_current"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_marginStart="15dp"
-                    android:layout_marginEnd="5dp"
-                    android:layout_weight="1"
-                    android:gravity="center_vertical"
-                    android:minHeight="48dp"
-                    android:text="@string/mngmnt_time"
-                    android:textSize="20sp" />
-
-                <Button
-                    android:id="@+id/time_picker"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="5dp"
+                    android:layout_marginTop="10dp"
                     android:layout_marginEnd="15dp"
-                    android:layout_weight="1"
-                    android:contentDescription="@string/mngmnt_chooseTime"
-                    android:text="@string/mngmnt_selectTime" />
-            </TableRow>
+                    android:text="@string/mngmnt_current_regular_appointment"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
 
-            <ImageButton
-                android:id="@+id/saveChangedAppointmentTime"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_gravity="end"
-                android:layout_marginTop="10dp"
-                android:layout_marginEnd="25dp"
-                android:layout_marginBottom="10dp"
-                android:background="#0000"
-                android:contentDescription="@string/mngmnt_default_regular_appointment_confirm"
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <TextView
+                        android:id="@+id/mngmnt_current_day"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="15dp"
+                        android:layout_marginEnd="5dp"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical"
+                        android:minHeight="48dp"
+                        android:text="@string/mngmnt_day"
+                        android:textSize="20sp" />
+
+                    <TextView
+                        android:id="@+id/mngmnt_currentDay"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginEnd="15dp"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical"
+                        android:minHeight="48dp"
+                        android:paddingStart="10dp"
+                        android:text="@string/sun"
+                        android:textSize="20sp" />
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <TextView
+                        android:id="@+id/mngmnt_current_time"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="15dp"
+                        android:layout_marginEnd="5dp"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical"
+                        android:minHeight="48dp"
+                        android:text="@string/mngmnt_time"
+                        android:textSize="20sp" />
+
+                    <TextView
+                        android:id="@+id/mngmnt_currentTime"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginEnd="15dp"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical"
+                        android:minHeight="48dp"
+                        android:paddingStart="10dp"
+                        android:text="19:00"
+                        android:textSize="20sp" />
+                </TableRow>
+
+                <TextView
+                    android:id="@+id/mngmnt_regular_appointment_default"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="15dp"
+                    android:text="@string/mngmnt_default_regular_appointment"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/mngmnt_day"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="15dp"
+                        android:layout_marginEnd="5dp"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical"
+                        android:maxHeight="48dp"
+                        android:minHeight="48dp"
+                        android:text="@string/mngmnt_day"
+                        android:textSize="20sp" />
+
+                    <Spinner
+                        android:id="@+id/day_spinner"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginEnd="15dp"
+                        android:layout_weight="1"
+                        android:contentDescription="@string/mngmnt_chooseDay" />
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/mngmnt_time"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="15dp"
+                        android:layout_marginEnd="5dp"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical"
+                        android:minHeight="48dp"
+                        android:text="@string/mngmnt_time"
+                        android:textSize="20sp" />
+
+                    <Button
+                        android:id="@+id/time_picker"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginEnd="15dp"
+                        android:layout_weight="1"
+                        android:contentDescription="@string/mngmnt_chooseTime"
+                        android:text="@string/mngmnt_selectTime" />
+                </TableRow>
+
+                <ImageButton
+                    android:id="@+id/saveChangedAppointmentTime"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_gravity="end"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="25dp"
+                    android:layout_marginBottom="10dp"
+                    android:background="#0000"
+                    android:contentDescription="@string/mngmnt_default_regular_appointment_confirm"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/check" />
+
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/imageView10"
+                android:layout_width="150dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
                 android:scaleType="fitCenter"
-                android:src="@drawable/check" />
+                app:srcCompat="@drawable/app_icon" />
 
         </LinearLayout>
+    </ScrollView>
 
-        <ImageView
-            android:id="@+id/imageView10"
-            android:layout_width="150dp"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:scaleType="fitCenter"
-            app:srcCompat="@drawable/app_icon" />
-
-    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

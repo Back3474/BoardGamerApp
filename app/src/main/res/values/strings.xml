@@ -248,6 +248,9 @@
     <string name="rating_last_gamenight_date">Date</string>
     <string name="rating_last_gamenight_host">Host</string>
     <string name="login_wrong_email_or_password">Wrong email or password!</string>
+    <string name="login_user_deactivated_title">Account deactivated</string>
+    <string name="login_user_deactivated_msg">Your account has been deactivated! Please contact an admin!</string>
+    <string name="appointment_new_meeting_generated">A new meeting has been generated successfully!</string>
 
     <string name="mon">Monday</string>
     <string name="tue">Tuesday</string>

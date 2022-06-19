@@ -51,9 +51,51 @@ public class LoginActivity extends AppCompatActivity {
         login_btn = findViewById(R.id.login_loginBtn);
         regis_btn = findViewById(R.id.login_regisBtn);
         auth = FirebaseAuth.getInstance();
-        db = FirebaseDatabase.getInstance();
+        db = FirebaseDatabase.getInstance("https://board-gamer-app-ff958-default-rtdb.firebaseio.com");
         resetPass = findViewById(R.id.resetPass);
+        statusAutoLogin = "test";
+        findViewById(R.id.loginLayout).setVisibility(View.VISIBLE);
+        findViewById(R.id.loadingPanel).setVisibility(View.GONE);
 
+        DatabaseReference refUser = db.getReference("users/");
+
+        if (auth.getCurrentUser() != null) {
+            findViewById(R.id.loginLayout).setVisibility(View.GONE);
+            findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
+            DatabaseReference refUserStatus = db.getReference("users/"+auth.getUid());
+            refUserStatus.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if(snapshot.child("status").getValue().toString().equals("deactivated")){
+                        auth.signOut();
+                        AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
+                        builder.setCancelable(true);
+                        builder.setTitle(R.string.login_user_deactivated_title);
+                        builder.setMessage(R.string.login_user_deactivated_msg);
+                        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+
+                            }
+                        });
+                        AlertDialog dialog = builder.create();
+                        dialog.show();
+                        findViewById(R.id.loginLayout).setVisibility(View.VISIBLE);
+                        findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+                    } else {
+                        startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+        } else {
+            findViewById(R.id.loginLayout).setVisibility(View.VISIBLE);
+            findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+        }
 
         resetPass.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -121,22 +163,33 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()){
-                    DatabaseReference ref = db.getReference("users/" + auth.getUid().toString());
-                    ref.addValueEventListener(new ValueEventListener() {
+                    DatabaseReference refUserStatus = db.getReference("users/"+auth.getUid());
+                    refUserStatus.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            statusLogin = snapshot.child("status").getValue().toString();
-                            if (statusLogin.equals("deactivated")) {
+                            if(snapshot.child("status").getValue().toString().equals("deactivated")){
                                 auth.signOut();
+                                AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
+                                builder.setCancelable(true);
+                                builder.setTitle(R.string.login_user_deactivated_title);
+                                builder.setMessage(R.string.login_user_deactivated_msg);
+                                builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                                    }
+                                });
+                                AlertDialog dialog = builder.create();
+                                dialog.show();
                                 findViewById(R.id.loginLayout).setVisibility(View.VISIBLE);
                                 findViewById(R.id.loadingPanel).setVisibility(View.GONE);
-                                Toast.makeText(LoginActivity.this, R.string.acc_deactivated, Toast.LENGTH_SHORT).show();
+                                TextView email = findViewById(R.id.email_login);
+                                email.setText("");
+                                TextView password = findViewById(R.id.password_login);
+                                password.setText("");
                             } else {
                                 Toast.makeText(LoginActivity.this, R.string.login_success, Toast.LENGTH_SHORT).show();
                                 startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                                finish();
-                                findViewById(R.id.loginLayout).setVisibility(View.VISIBLE);
-                                findViewById(R.id.loadingPanel).setVisibility(View.GONE);
                             }
                         }
 
@@ -159,31 +212,7 @@ public class LoginActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        if (auth.getCurrentUser() != null) {
-            findViewById(R.id.loginLayout).setVisibility(View.GONE);
-            DatabaseReference ref = db.getReference("users/" + auth.getUid().toString());
-            ref.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    statusAutoLogin = snapshot.child("status").getValue().toString();
-                    if (statusAutoLogin.equals("deactivated")) {
-                        auth.signOut();
-                        Toast.makeText(LoginActivity.this, R.string.acc_deactivated, Toast.LENGTH_SHORT).show();
-                    } else {
-                        startActivity(new Intent(LoginActivity.this, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK));
 
-                        findViewById(R.id.loadingPanel).setVisibility(View.GONE);
-                    }
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-
-                }
-            });
-        } else {
-            findViewById(R.id.loadingPanel).setVisibility(View.GONE);
-        }
     }
 
     @Override
