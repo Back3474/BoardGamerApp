@@ -1,5 +1,8 @@
 package com.example.boardgamerapp;
 
+import static java.time.temporal.ChronoUnit.DAYS;
+import static java.time.temporal.ChronoUnit.HOURS;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -8,9 +11,12 @@ import android.app.Dialog;
 import android.content.ClipData;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -30,6 +36,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -64,6 +75,7 @@ public class GamesActivity extends AppCompatActivity {
 
         listView = findViewById(R.id.gamesList);
         gamesList = new ArrayList<>();
+        gamesListItem = findViewById(R.id.games_list_item_layout);
         suggestGame = findViewById(R.id.suggestGameBtn);
         suggestedGame = findViewById(R.id.suggestedGame);
         voteBtn = findViewById(R.id.vote_game_btn);
@@ -88,6 +100,49 @@ public class GamesActivity extends AppCompatActivity {
                     voteBtn.setText(R.string.games_suggest_game_one_vote_left);
                 } else {
                     voteBtn.setText(R.string.games_vote_btn_no_more_votes);
+                }
+
+                int hour = snapshot.child("hour").getValue(Integer.class);
+                int min = snapshot.child("minute").getValue(Integer.class);
+                LocalTime meetingTime = LocalTime.of(hour, min);
+                LocalDate meetingDate = LocalDate.parse(snapshot.child("date").getValue().toString());
+                LocalDateTime meeting = LocalDateTime.of(meetingDate, meetingTime);
+                LocalDateTime now = LocalDateTime.now();
+                LocalDateTime endOfVoting = meeting.minus(1, DAYS);
+                DateTimeFormatter dtf = DateTimeFormatter.ofPattern(getText(R.string.date_time_format).toString());
+                String endOfVoting_formatted = endOfVoting.format(dtf);
+                TextView endOfVoting_txt = findViewById(R.id.end_of_voting);
+                endOfVoting_txt.setText(getText(R.string.games_end_of_voting) + " " + endOfVoting_formatted);
+
+                if(HOURS.between(now, meeting) < 24){
+                    endOfVoting_txt.setText("");
+                    TextView gamesLabel = findViewById(R.id.games_sug_games);
+                    gamesLabel.setText(R.string.games_no_more_votes);
+                    findViewById(R.id.suggest_game_layout).setVisibility(View.GONE);
+                    voteBtn.setVisibility(View.GONE);
+
+                    listView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                        @Override
+                        public void onGlobalLayout() {
+                            listView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                            for(int i = 0; i <= gamesList.size() - 1; i++){
+                                if(i > 2){
+                                    gamesList.remove(i);
+                                }
+                            }
+                            gamesList.remove(3);
+                            ArrayAdapter gamesListAdapter = new GamesListAdapter(GamesActivity.this, 0, gamesList);
+                            listView.setAdapter(gamesListAdapter);
+                        }
+                    });
+                }
+                if(snapshot.child("isCanceled").getValue(Boolean.class)){
+                    endOfVoting_txt.setText("");
+                    TextView gamesLabel = findViewById(R.id.games_sug_games);
+                    gamesLabel.setText(R.string.games_meeting_canceled);
+                    findViewById(R.id.suggest_game_layout).setVisibility(View.GONE);
+                    findViewById(R.id.suggestedGames_layout).setVisibility(View.GONE);
+                    voteBtn.setVisibility(View.GONE);
                 }
             }
 
@@ -150,7 +205,16 @@ public class GamesActivity extends AppCompatActivity {
                                         TextView gameName = view.findViewById(R.id.gameName);
 
                                         if(votedGame.equals(gameName.getText().toString())){
-                                            Toast.makeText(GamesActivity.this, R.string.games_vote_not_same_game, Toast.LENGTH_SHORT).show();
+                                            AlertDialog.Builder builder = new AlertDialog.Builder(GamesActivity.this);
+                                            builder.setTitle(R.string.games_vote_not_same_game);
+                                            builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialogInterface, int i) {
+
+                                                }
+                                            });
+                                            AlertDialog dialog = builder.create();
+                                            dialog.show();
                                         } else {
                                             AlertDialog.Builder builder = new AlertDialog.Builder(GamesActivity.this);
                                             builder.setCancelable(true);

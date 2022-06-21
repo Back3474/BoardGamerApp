@@ -11,9 +11,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -94,6 +98,7 @@ public class RatingActivity extends AppCompatActivity {
         DatabaseReference refUser = db.getReference("users/"+auth.getUid());
         DatabaseReference refParticipants = db.getReference("last gamenight/participants");
 
+
         refUser.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -159,7 +164,23 @@ public class RatingActivity extends AppCompatActivity {
                     ArrayAdapter ratingListAdapter = new RatingListAdapter(RatingActivity.this, ratings);
                     ratingsListView.setAdapter(ratingListAdapter);
                     allRatingsLayout.setVisibility(View.VISIBLE);
+/*
+                    allRatingsLayout.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                        @Override
+                        public void onGlobalLayout() {
+                            allRatingsLayout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                            int actualHeight = allRatingsLayout.getHeight();
+                            float scale = RatingActivity.this.getResources().getDisplayMetrics().density;
+                            int allRatingsLayoutPixels = (int) (200 * scale + 0.5f);
+                            if(actualHeight > allRatingsLayoutPixels){
+                                ViewGroup.LayoutParams params = allRatingsLayout.getLayoutParams();
+                                params.height = allRatingsLayoutPixels;
+                                allRatingsLayout.setLayoutParams(params);
+                            }
+                        }
+                    });*/
                 }
+
             }
 
             @Override

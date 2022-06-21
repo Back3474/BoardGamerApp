@@ -156,6 +156,7 @@
     <string name="acc_deactivated">Your account has been deactivated! Please contact an admin!</string>
     <string name="enter_login_data">Please enter your login data!</string>
     <string name="date_format">MM/dd/yyyy</string>
+    <string name="date_time_format">MM/dd/yyyy HH:mm</string>
     <string name="games_suggest_game_btn">suggest game</string>
     <string name="rate_last_gamenight_title">Rate last Gamenight</string>
     <string name="rate_last_gamenight_msg">Do you want to rate the last Gamenight? (your rating:</string>
@@ -178,13 +179,16 @@
     <string name="games_suggest_game_one_vote_left">Vote game (1 vote left)</string>
     <string name="games_no_games_suggested">no games suggested</string>
     <string name="games_cancel">cancel</string>
-    <string name="games_voted_2x_already">You voted 2x already!</string>
+    <string name="games_voted_2x_already">You voted 2 times already!</string>
     <string name="games_suggested_2x_already">You suggested 2 games already!</string>
     <string name="games_click_on_game_vote">Click on the game you want to vote for!</string>
-    <string name="games_vote_for_game_msg">Do you want to vote for:</string>
+    <string name="games_vote_for_game_msg">Do you want to vote for</string>
     <string name="games_vote_btn_no_more_votes">No votes left</string>
     <string name="games_vote_not_same_game">You can\'t vote for the same game twice!</string>
     <string name="games_vote_success">Voted successfully!</string>
+    <string name="games_end_of_voting">End of Voting:</string>
+    <string name="games_no_more_votes">No more Votes/ Suggestions! \nGames have been chosen!</string>
+    <string name="games_meeting_canceled">Meeting has been canceled!</string>
     <string name="late_time_already_set_5_min">Your latetime is already set to 5 minutes!</string>
     <string name="late_time_set_to_5_min">Your latetime has been set to 5 minutes!</string>
     <string name="late_time_changed_to_5_min">Your latetime has been changed to 5 minutes!</string>
