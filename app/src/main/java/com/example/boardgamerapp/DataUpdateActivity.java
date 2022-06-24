@@ -25,6 +25,8 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class DataUpdateActivity extends AppCompatActivity {
     private EditText firstname;
@@ -63,7 +65,13 @@ public class DataUpdateActivity extends AppCompatActivity {
                 if (!TextUtils.isEmpty(txt_fn)) {map.put("firstname", txt_fn);}
                 if (!TextUtils.isEmpty(txt_ln)) {map.put("lastname", txt_ln);}
                 if (!TextUtils.isEmpty(txt_email)) {map.put("email", txt_email);}
-                if (!TextUtils.isEmpty(txt_adr)) {map.put("address", txt_adr);}
+                if (!TextUtils.isEmpty(txt_adr)) {
+                    if(addressValidates(txt_adr)) {
+                        map.put("address", txt_adr);
+                    } else {
+                        Toast.makeText(DataUpdateActivity.this, R.string.regis_invalid_address, Toast.LENGTH_SHORT).show();
+                    }
+                }
 
                 updateData (map);
                 map.clear();
@@ -73,6 +81,12 @@ public class DataUpdateActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    private boolean addressValidates(String txt_adr) {
+        Pattern pattern = Pattern.compile("[\\w]+\\.?\\s[\\w]+,\\s[\\w]+\\s[\\w]+");
+        Matcher matcher = pattern.matcher(txt_adr);
+        return matcher.matches();
     }
 
     private void updateData(HashMap map) {

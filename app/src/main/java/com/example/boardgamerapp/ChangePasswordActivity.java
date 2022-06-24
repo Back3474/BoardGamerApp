@@ -20,6 +20,9 @@ import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class ChangePasswordActivity extends AppCompatActivity {
     private EditText currentPass;
     private EditText newPass;
@@ -51,7 +54,11 @@ public class ChangePasswordActivity extends AppCompatActivity {
                     Toast.makeText(ChangePasswordActivity.this, R.string.enter_new_pass, Toast.LENGTH_SHORT).show();
                 } else if (newPass.getText().length() < 8) {
                     Toast.makeText(ChangePasswordActivity.this, R.string.password_too_short, Toast.LENGTH_SHORT).show();
-                }  else if (newPass.getText().toString().equals(confNewPass.getText().toString())) {
+                } else if (newPass.getText().length() > 20) {
+                    Toast.makeText(ChangePasswordActivity.this, R.string.password_too_long, Toast.LENGTH_SHORT).show();
+                } else if (!passwordValidates(newPass.getText().toString())) {
+                    Toast.makeText(ChangePasswordActivity.this, R.string.regis_invalid_password, Toast.LENGTH_LONG).show();
+                } else if (newPass.getText().toString().equals(confNewPass.getText().toString())) {
                     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
                     AuthCredential credential = EmailAuthProvider
@@ -85,6 +92,19 @@ public class ChangePasswordActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    public boolean passwordValidates(String pass) {
+        int count = 0;
+
+        if(pass.matches(".*\\d.*"))
+            count ++;
+        if(pass.matches(".*[a-z].*"))
+            count ++;
+        if(pass.matches(".*[A-Z].*"))
+            count ++;
+
+        return count == 3;
     }
 
     @Override
