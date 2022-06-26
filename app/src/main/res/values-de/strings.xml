@@ -254,6 +254,10 @@
     <string name="login_user_deactivated_title">Konto deaktiviert</string>
     <string name="login_user_deactivated_msg">Dein Konto wurde deaktiviert! Bitte kontaktiere einen Admin!</string>
     <string name="appointment_new_meeting_generated">Ein neuer Termin wurde erfolgreich generiert!</string>
+    <string name="account_change_password_title">Passwort ändern</string>
+    <string name="account_change_password_msg">Möchtest du dein Password ändern?</string>
+    <string name="account_data_update_title">Kontodaten aktualisieren</string>
+    <string name="account_data_update_msg">Möchtest du deine Kontodaten aktualisieren?</string>
 
     <string name="mon">Montag</string>
     <string name="tue">Dienstag</string>

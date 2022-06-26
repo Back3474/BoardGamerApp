@@ -61,16 +61,48 @@ public class UserAccountActivity extends AppCompatActivity {
         changePass.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(UserAccountActivity.this, ChangePasswordActivity.class));
-                finish();
+                AlertDialog.Builder builder = new AlertDialog.Builder(UserAccountActivity.this);
+                builder.setCancelable(true);
+                builder.setTitle(R.string.account_change_password_title);
+                builder.setMessage(R.string.account_change_password_msg);
+                builder.setPositiveButton(R.string.discard_yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        startActivity(new Intent(UserAccountActivity.this, ChangePasswordActivity.class));
+                        finish();
+                    }
+                });
+                builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                    }
+                });
+                AlertDialog dialog = builder.create();
+                dialog.show();
             }
         });
 
         changeAccData.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(UserAccountActivity.this, DataUpdateActivity.class));
-                finish();
+                AlertDialog.Builder builder = new AlertDialog.Builder(UserAccountActivity.this);
+                builder.setCancelable(true);
+                builder.setTitle(R.string.account_data_update_title);
+                builder.setMessage(R.string.account_data_update_msg);
+                builder.setPositiveButton(R.string.discard_yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        startActivity(new Intent(UserAccountActivity.this, DataUpdateActivity.class));
+                        finish();
+                    }
+                });
+                builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                    }
+                });
+                AlertDialog dialog = builder.create();
+                dialog.show();
             }
         });
     }
