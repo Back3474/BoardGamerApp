@@ -498,8 +498,8 @@ public class AppointmentActivity extends AppCompatActivity {
                     } else {
                     if(!selectDateBtn.getText().toString().equals(getText(R.string.appointment_select_date)) || !TextUtils.isEmpty(editAddress.getText()) || !selectTimeBtn.getText().toString().equals(getText(R.string.appointment_select_time))){
                         AlertDialog.Builder builder = new AlertDialog.Builder(AppointmentActivity.this);
-                        builder.setTitle("Warning");
-                        builder.setMessage("This will discard all your changes! Do you want to continue?");
+                        builder.setTitle(R.string.discard_title);
+                        builder.setMessage(R.string.discard_msg);
                         builder.setCancelable(true);
                         builder.setPositiveButton(R.string.discard_yes, new DialogInterface.OnClickListener() {
                             @Override
@@ -771,7 +771,60 @@ public class AppointmentActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        startActivity(new Intent(AppointmentActivity.this, MainActivity.class));
-        finish();
+        if(clickedForEdit == true){
+            if(!selectDateBtn.getText().toString().equals(getText(R.string.appointment_select_date)) || !TextUtils.isEmpty(editAddress.getText()) || !selectTimeBtn.getText().toString().equals(getText(R.string.appointment_select_time))) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(AppointmentActivity.this);
+                builder.setTitle(R.string.discard_title);
+                builder.setMessage(R.string.discard_msg);
+                builder.setCancelable(true);
+                builder.setPositiveButton(R.string.discard_yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        hostLabel.setVisibility(View.VISIBLE);
+                        nxtMeetingHost.setVisibility(View.VISIBLE);
+                        viewSwitcherDay.showPrevious();
+                        viewSwitcherTime.showPrevious();
+                        viewSwitcherAddress.showPrevious();
+                        clickedForEdit = false;
+                        editMeetingBtn.setText(R.string.meeting_edit_mtng_btn);
+                        confirmChanges.setVisibility(View.GONE);
+                        selectDateBtn.setText(R.string.appointment_select_date);
+                        editAddress.setText(null);
+                        selectTimeBtn.setText(R.string.appointment_select_time);
+                        cancelMeetingBtn.setAlpha(1f);
+                        cancelMeetingBtn.setClickable(true);
+                        confirmMeetingEndBtn.setAlpha(1f);
+                        confirmMeetingEndBtn.setClickable(true);
+                    }
+                });
+                builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+                });
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            } else {
+                hostLabel.setVisibility(View.VISIBLE);
+                nxtMeetingHost.setVisibility(View.VISIBLE);
+                viewSwitcherDay.showPrevious();
+                viewSwitcherTime.showPrevious();
+                viewSwitcherAddress.showPrevious();
+                clickedForEdit = false;
+                editMeetingBtn.setText(R.string.meeting_edit_mtng_btn);
+                confirmChanges.setVisibility(View.GONE);
+                selectDateBtn.setText(R.string.appointment_select_date);
+                editAddress.setText(null);
+                selectTimeBtn.setText(R.string.appointment_select_time);
+                cancelMeetingBtn.setAlpha(1f);
+                cancelMeetingBtn.setClickable(true);
+                confirmMeetingEndBtn.setAlpha(1f);
+                confirmMeetingEndBtn.setClickable(true);
+            }
+        } else {
+            startActivity(new Intent(AppointmentActivity.this, MainActivity.class));
+            finish();
+        }
     }
 }

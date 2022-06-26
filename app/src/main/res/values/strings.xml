@@ -16,8 +16,7 @@
     <string name="regis_data_pers">personal data:</string>
     <string name="regis_data_login">login data:</string>
     <string name="regis_save_btn">save</string>
-    <string name="back_btn">previous</string>
-    <string name="discard_title">Are you sure?</string>
+    <string name="discard_title">Warning</string>
     <string name="discard_msg">This will discard all your data entries. Do you want to continue?</string>
     <string name="discard_yes">Yes</string>
     <string name="late_quick_msg">quick message:</string>
