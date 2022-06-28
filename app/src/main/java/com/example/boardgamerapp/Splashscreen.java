@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 
+import com.google.firebase.messaging.FirebaseMessaging;
+
 public class Splashscreen extends AppCompatActivity {
 
     @Override
@@ -15,6 +17,10 @@ public class Splashscreen extends AppCompatActivity {
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splashscreen);
+
+        FirebaseMessaging firebaseMessaging = FirebaseMessaging.getInstance();
+        firebaseMessaging.subscribeToTopic("new_user_forums");
+        firebaseMessaging.subscribeToTopic("next_meeting");
 
         final Handler handler = new Handler();
         final Runnable r = new Runnable() {
