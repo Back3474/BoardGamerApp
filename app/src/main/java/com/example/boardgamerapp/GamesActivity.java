@@ -14,6 +14,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -23,6 +24,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -93,6 +95,8 @@ public class GamesActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.hasChild("votes")){
                     votes = snapshot.child("votes").child(auth.getUid()).getChildrenCount();
+                } else {
+                    votes = 0;
                 }
                 if (votes == 0){
                     voteBtn.setText(R.string.games_suggest_game_two_votes_left);
@@ -125,14 +129,36 @@ public class GamesActivity extends AppCompatActivity {
                         @Override
                         public void onGlobalLayout() {
                             listView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                            for(int i = 0; i <= gamesList.size() - 1; i++){
-                                if(i > 2){
-                                    gamesList.remove(i);
+                            if(gamesList.isEmpty()){
+                                gamesList.add(new Game(getText(R.string.games_no_games_suggested).toString(), 0));
+                            } else if(gamesList.size() > 3) {
+                                for(int i = 0; i <= gamesList.size() - 1; i++){
+                                    if(i > 2){
+                                        gamesList.remove(i);
+                                    }
                                 }
+                                gamesList.remove(3);
                             }
-                            gamesList.remove(3);
+                            gamesLabel.setGravity(Gravity.CENTER);
+
+
                             ArrayAdapter gamesListAdapter = new GamesListAdapter(GamesActivity.this, 0, gamesList);
                             listView.setAdapter(gamesListAdapter);
+
+                            ListAdapter listadp = listView.getAdapter();
+                            if (listadp != null) {
+                                int totalHeight = 0;
+                                for (int i = 0; i < listadp.getCount(); i++) {
+                                    View listItem = listadp.getView(i, null, listView);
+                                    listItem.measure(0, 0);
+                                    totalHeight += listItem.getMeasuredHeight();
+                                }
+                                ViewGroup.LayoutParams params = listView.getLayoutParams();
+                                params.height = totalHeight + (listView.getDividerHeight() * (listadp.getCount() - 1));
+                                listView.setLayoutParams(params);
+                                listView.requestLayout();
+
+                            }
                         }
                     });
                 }

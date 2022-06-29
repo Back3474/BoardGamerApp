@@ -27,6 +27,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 public class LoginActivity extends AppCompatActivity {
     private EditText email;
@@ -68,6 +69,8 @@ public class LoginActivity extends AppCompatActivity {
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     if(snapshot.child("status").getValue().toString().equals("deactivated")){
                         auth.signOut();
+                        FirebaseMessaging firebaseMessaging = FirebaseMessaging.getInstance();
+                        firebaseMessaging.unsubscribeFromTopic("next_meeting");
                         AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
                         builder.setCancelable(true);
                         builder.setTitle(R.string.login_user_deactivated_title);

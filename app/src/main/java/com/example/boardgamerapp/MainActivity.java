@@ -23,6 +23,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -49,6 +50,8 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        FirebaseMessaging firebaseMessaging = FirebaseMessaging.getInstance();
+        firebaseMessaging.subscribeToTopic("next_meeting");
 
         overridePendingTransition(com.google.android.material.R.anim.abc_popup_enter, com.google.android.material.R.anim.abc_popup_exit);
 
@@ -377,6 +380,8 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 auth.signOut();
+                                FirebaseMessaging firebaseMessaging = FirebaseMessaging.getInstance();
+                                firebaseMessaging.unsubscribeFromTopic("next_meeting");
                                 startActivity(new Intent(MainActivity.this, LoginActivity.class));
                                 finish();
                             }

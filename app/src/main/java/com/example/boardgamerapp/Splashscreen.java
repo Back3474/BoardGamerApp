@@ -18,10 +18,6 @@ public class Splashscreen extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splashscreen);
 
-        FirebaseMessaging firebaseMessaging = FirebaseMessaging.getInstance();
-        firebaseMessaging.subscribeToTopic("new_user_forums");
-        firebaseMessaging.subscribeToTopic("next_meeting");
-
         final Handler handler = new Handler();
         final Runnable r = new Runnable() {
             public void run() {

@@ -258,6 +258,7 @@
     <string name="account_change_password_msg">Do you want to change your Password?</string>
     <string name="account_data_update_title">Update Account Data</string>
     <string name="account_data_update_msg">Do you want to update your Account Data?</string>
+    <string name="notification">HEADS_UP_NOTIFICATION</string>
 
     <string name="mon">Monday</string>
     <string name="tue">Tuesday</string>

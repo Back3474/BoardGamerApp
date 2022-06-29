@@ -38,6 +38,7 @@
                 android:layout_height="200dp"
                 android:layout_margin="10dp"
                 android:background="@drawable/border"
+                android:fadeScrollbars="false"
                 android:listSelector="@android:color/transparent" />
         </LinearLayout>
 

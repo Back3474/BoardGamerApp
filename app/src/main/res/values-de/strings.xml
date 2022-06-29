@@ -258,6 +258,7 @@
     <string name="account_change_password_msg">Möchtest du dein Password ändern?</string>
     <string name="account_data_update_title">Kontodaten aktualisieren</string>
     <string name="account_data_update_msg">Möchtest du deine Kontodaten aktualisieren?</string>
+    <string name="notification">HEADS_UP_NOTIFICATION</string>
 
     <string name="mon">Montag</string>
     <string name="tue">Dienstag</string>

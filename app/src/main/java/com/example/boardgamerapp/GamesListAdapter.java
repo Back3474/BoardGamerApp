@@ -30,7 +30,7 @@ public class GamesListAdapter extends ArrayAdapter<Game> {
 
         gameName.setText(game.getName());
         if(game.getVotes() != 0){
-            gameVotes.setText("Votes: " + String.valueOf(game.getVotes()));
+            gameVotes.setText("Vote(s): " + String.valueOf(game.getVotes()));
         } else {
             gameVotes.setText("");
         }
