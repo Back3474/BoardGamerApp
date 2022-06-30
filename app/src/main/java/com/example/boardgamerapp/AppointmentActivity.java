@@ -67,7 +67,7 @@ public class AppointmentActivity extends AppCompatActivity {
     private ViewSwitcher viewSwitcherDay, viewSwitcherTime, viewSwitcherAddress;
     private ImageButton confirmChanges;
     private EditText editAddress;
-    private int hour, minute, nextMtngHour, nextMtngMinute, appointmentDefHour, appointmentDefMinute;
+    private int hour, minute, nextMtngHour, nextMtngMinute, appointmentDefHour, appointmentDefMinute, changes;
     private String date, appointmentDefDay, defDayShort;
     private LocalDate inputDate, nextMeetingDate;
     private DatePickerDialog datePickerDialog;
@@ -199,6 +199,8 @@ public class AppointmentActivity extends AppCompatActivity {
                                         refNextMeeting.child("minute").setValue(appointmentDefMinute);
                                         refNextMeeting.child("day").setValue(defDayShort);
                                         refNextMeeting.child("date").setValue(nextMeetingDate.toString());
+
+                                        refNextMeeting.child("changes").setValue(0);
                                     }
 
                                     @Override
@@ -307,6 +309,8 @@ public class AppointmentActivity extends AppCompatActivity {
                                             refNextMeeting.child("minute").setValue(appointmentDefMinute);
                                             refNextMeeting.child("day").setValue(defDayShort);
                                             refNextMeeting.child("date").setValue(nextMeetingDate.toString());
+
+                                            refNextMeeting.child("changes").setValue(0);
                                         }
 
                                         @Override
@@ -588,6 +592,19 @@ public class AppointmentActivity extends AppCompatActivity {
     }
 
     private void confrimAllChanges() {
+        changes = 0;
+        DatabaseReference refChanges = db.getReference("next meeting/changes");
+        refChanges.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                changes = snapshot.getValue(Integer.class);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
         confirmChanges.setAlpha(1.0f);
         if(!confirmChanges.hasOnClickListeners()){
             confirmChanges.setOnClickListener(new View.OnClickListener() {
@@ -606,81 +623,52 @@ public class AppointmentActivity extends AppCompatActivity {
                             int day = datePickerDialog.getDatePicker().getDayOfMonth();
                             LocalDate newLocalDate = LocalDate.of(year, month, day);
                             LocalDate today = LocalDate.now();
-                            if(today.compareTo(newLocalDate) > -1){
-                                Toast.makeText(AppointmentActivity.this, R.string.appointment_select_date_future, Toast.LENGTH_SHORT).show();
-                            } else {
-                                String newDate = String.format(Locale.getDefault(), "%04d-%02d-%02d", year, month, day);
-                                String dayOfWeek = LocalDate.parse(newDate).getDayOfWeek().name().toString();
-                                if(dayOfWeek == "MONDAY"){
-                                    dayOfWeek = "mon";
-                                }
-                                if(dayOfWeek == "TUESDAY"){
-                                    dayOfWeek = "tue";
-                                }
-                                if(dayOfWeek == "WEDNESDAY"){
-                                    dayOfWeek = "wed";
-                                }
-                                if(dayOfWeek == "THURSDAY"){
-                                    dayOfWeek = "thu";
-                                }
-                                if(dayOfWeek == "FRIDAY"){
-                                    dayOfWeek = "fri";
-                                }
-                                if(dayOfWeek == "SATURDAY"){
-                                    dayOfWeek = "sat";
-                                }
-                                if(dayOfWeek == "SUNDAY"){
-                                    dayOfWeek = "sun";
-                                }
+                            String newDate = String.format(Locale.getDefault(), "%04d-%02d-%02d", year, month, day);
+                            String dayOfWeek = LocalDate.parse(newDate).getDayOfWeek().name().toString();
+                            if(dayOfWeek == "MONDAY"){
+                                dayOfWeek = "mon";
+                            }
+                            if(dayOfWeek == "TUESDAY"){
+                                dayOfWeek = "tue";
+                            }
+                            if(dayOfWeek == "WEDNESDAY"){
+                                dayOfWeek = "wed";
+                            }
+                            if(dayOfWeek == "THURSDAY"){
+                                dayOfWeek = "thu";
+                            }
+                            if(dayOfWeek == "FRIDAY"){
+                                dayOfWeek = "fri";
+                            }
+                            if(dayOfWeek == "SATURDAY"){
+                                dayOfWeek = "sat";
+                            }
+                            if(dayOfWeek == "SUNDAY"){
+                                dayOfWeek = "sun";
+                            }
 
-                                int newHour = hour;
-                                int newMinute = minute;
+                            int newHour = hour;
+                            int newMinute = minute;
 
-                                String newAddress = editAddress.getText().toString();
+                            String newAddress = editAddress.getText().toString();
 
-                                DatabaseReference ref = db.getReference("next meeting");
-                                Map newMeeting = new HashMap<String, Object>();
+                            DatabaseReference ref = db.getReference("next meeting");
+                            Map newMeeting = new HashMap<String, Object>();
 
-                                newMeeting.clear();
-                                if(!selectDateBtn.getText().equals(R.string.appointment_select_date)){
-                                    newMeeting.put("date", newDate);
-                                    newMeeting.put("day", dayOfWeek);
-                                }
-                                if(!selectTimeBtn.getText().equals(R.string.appointment_select_time)){
-                                    newMeeting.put("hour", newHour);
-                                    newMeeting.put("minute", newMinute);
-                                }
-                                if(!TextUtils.isEmpty(editAddress.getText())){
-                                    if(!addressValidates(newAddress)){
-                                        Toast.makeText(AppointmentActivity.this, R.string.appointment_invalid_address, Toast.LENGTH_SHORT).show();
-                                    } else {
-                                        newMeeting.put("address", newAddress);
-                                        ref.updateChildren(newMeeting).addOnCompleteListener(new OnCompleteListener() {
-                                            @Override
-                                            public void onComplete(@NonNull Task task) {
-                                                if(task.isSuccessful()){
-                                                    hostLabel.setVisibility(View.VISIBLE);
-                                                    nxtMeetingHost.setVisibility(View.VISIBLE);
-                                                    viewSwitcherDay.showPrevious();
-                                                    viewSwitcherTime.showPrevious();
-                                                    viewSwitcherAddress.showPrevious();
-                                                    clickedForEdit = false;
-                                                    editMeetingBtn.setText(R.string.meeting_edit_mtng_btn);
-                                                    confirmChanges.setVisibility(View.GONE);
-                                                    selectDateBtn.setText(R.string.appointment_select_date);
-                                                    editAddress.setText(null);
-                                                    selectTimeBtn.setText(R.string.appointment_select_time);
-                                                    cancelMeetingBtn.setAlpha(1f);
-                                                    cancelMeetingBtn.setClickable(true);
-                                                    confirmMeetingEndBtn.setAlpha(1f);
-                                                    confirmMeetingEndBtn.setClickable(true);
-                                                } else {
-                                                    Toast.makeText(AppointmentActivity.this, "failed", Toast.LENGTH_SHORT).show();
-                                                }
-                                            }
-                                        });
-                                    }
+                            newMeeting.clear();
+                            if(today.compareTo(newLocalDate) < 0){
+                                newMeeting.put("date", newDate);
+                                newMeeting.put("day", dayOfWeek);
+                            }
+                            if(!selectTimeBtn.getText().equals(R.string.appointment_select_time)){
+                                newMeeting.put("hour", newHour);
+                                newMeeting.put("minute", newMinute);
+                            }
+                            if(!TextUtils.isEmpty(editAddress.getText())){
+                                if(!addressValidates(newAddress)){
+                                    Toast.makeText(AppointmentActivity.this, R.string.appointment_invalid_address, Toast.LENGTH_SHORT).show();
                                 } else {
+                                    newMeeting.put("address", newAddress);
                                     ref.updateChildren(newMeeting).addOnCompleteListener(new OnCompleteListener() {
                                         @Override
                                         public void onComplete(@NonNull Task task) {
@@ -706,8 +694,34 @@ public class AppointmentActivity extends AppCompatActivity {
                                         }
                                     });
                                 }
+                            } else {
+                                ref.updateChildren(newMeeting).addOnCompleteListener(new OnCompleteListener() {
+                                    @Override
+                                    public void onComplete(@NonNull Task task) {
+                                        if(task.isSuccessful()){
+                                            hostLabel.setVisibility(View.VISIBLE);
+                                            nxtMeetingHost.setVisibility(View.VISIBLE);
+                                            viewSwitcherDay.showPrevious();
+                                            viewSwitcherTime.showPrevious();
+                                            viewSwitcherAddress.showPrevious();
+                                            clickedForEdit = false;
+                                            editMeetingBtn.setText(R.string.meeting_edit_mtng_btn);
+                                            confirmChanges.setVisibility(View.GONE);
+                                            selectDateBtn.setText(R.string.appointment_select_date);
+                                            editAddress.setText(null);
+                                            selectTimeBtn.setText(R.string.appointment_select_time);
+                                            cancelMeetingBtn.setAlpha(1f);
+                                            cancelMeetingBtn.setClickable(true);
+                                            confirmMeetingEndBtn.setAlpha(1f);
+                                            confirmMeetingEndBtn.setClickable(true);
+                                        } else {
+                                            Toast.makeText(AppointmentActivity.this, "failed", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                });
                             }
-
+                            int changesN = changes + 1;
+                            ref.child("changes").setValue(changesN);
                         }
                     });
                     builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {

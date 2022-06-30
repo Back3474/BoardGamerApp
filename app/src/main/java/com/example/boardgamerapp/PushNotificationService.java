@@ -8,8 +8,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.text.Html;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -21,25 +23,41 @@ public class PushNotificationService extends FirebaseMessagingService {
     @Override
     public void onMessageReceived(@NonNull RemoteMessage message) {
         super.onMessageReceived(message);
+
         String id = message.getData().get("msgId").toString();
-        String title = message.getData().get("title").toString();
-        String text = message.getData().get("body").toString();
+        String titleRaw = message.getData().get("title").toString();
+        String title = getString(getResources().getIdentifier(titleRaw, "string", getPackageName()));
+        String textRaw = message.getData().get("body").toString();
+        String text = getString(getResources().getIdentifier(textRaw, "string", getPackageName()));
+
+
         final String CHANNEL_ID = "HEADS_UP_NOTIFICATION";
         NotificationChannel channel = new NotificationChannel(
                 CHANNEL_ID,
                 "Heads Up Notification",
                 NotificationManager.IMPORTANCE_HIGH
         );
-        Intent resultIntent = new Intent(getApplicationContext(), MainActivity.class);
-        resultIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent resultPendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, resultIntent, PendingIntent.FLAG_CANCEL_CURRENT );
+
         getSystemService(NotificationManager.class).createNotificationChannel(channel);
         Notification.Builder notification = new Notification.Builder(this, CHANNEL_ID)
-                .setContentTitle(title)
+                .setContentTitle(Html.fromHtml("<b>"+title+"</b>", Html.FROM_HTML_MODE_COMPACT))
                 .setContentText(text)
                 .setSmallIcon(R.drawable.ic_launcher_background)
                 .setAutoCancel(true)
-                .setContentIntent(resultPendingIntent);
+                .setStyle(new Notification.BigTextStyle().bigText(text).setBigContentTitle(Html.fromHtml("<b>"+title+"</b>", Html.FROM_HTML_MODE_COMPACT)));
+
+        if(id.equals("next_meeting")){
+            Intent resultIntent = new Intent(getApplicationContext(), MainActivity.class);
+            resultIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            PendingIntent resultPendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, resultIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+            notification.setContentIntent(resultPendingIntent);
+        } else if(id.equals("rating")){
+            Intent resultIntent = new Intent(getApplicationContext(), RatingActivity.class);
+            resultIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            PendingIntent resultPendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, resultIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+            notification.setContentIntent(resultPendingIntent);
+        }
+
         NotificationManagerCompat.from(this).notify(1, notification.build());
     }
 

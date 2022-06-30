@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
 
         FirebaseMessaging firebaseMessaging = FirebaseMessaging.getInstance();
         firebaseMessaging.subscribeToTopic("next_meeting");
+        firebaseMessaging.subscribeToTopic("rating_changed");
 
         overridePendingTransition(com.google.android.material.R.anim.abc_popup_enter, com.google.android.material.R.anim.abc_popup_exit);
 
@@ -382,6 +383,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                                 auth.signOut();
                                 FirebaseMessaging firebaseMessaging = FirebaseMessaging.getInstance();
                                 firebaseMessaging.unsubscribeFromTopic("next_meeting");
+                                firebaseMessaging.unsubscribeFromTopic("rating_changed");
                                 startActivity(new Intent(MainActivity.this, LoginActivity.class));
                                 finish();
                             }

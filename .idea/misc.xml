@@ -3,6 +3,7 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/Back1/AndroidStudioProjects/BoardGamerApp/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.1" />
         <entry key="..\:/Users/Back1/AndroidStudioProjects/BoardGamerApp/app/src/main/res/drawable/border.xml" value="0.1" />
         <entry key="..\:/Users/Back1/AndroidStudioProjects/BoardGamerApp/app/src/main/res/drawable/border_colored.xml" value="0.1" />
         <entry key="..\:/Users/Back1/AndroidStudioProjects/BoardGamerApp/app/src/main/res/layout/activity_account.xml" value="0.264" />

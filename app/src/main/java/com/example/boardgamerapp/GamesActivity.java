@@ -13,7 +13,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -79,6 +81,8 @@ public class GamesActivity extends AppCompatActivity {
         gamesList = new ArrayList<>();
         gamesListItem = findViewById(R.id.games_list_item_layout);
         suggestGame = findViewById(R.id.suggestGameBtn);
+        suggestGame.setAlpha(0.3f);
+        suggestGame.setClickable(false);
         suggestedGame = findViewById(R.id.suggestedGame);
         voteBtn = findViewById(R.id.vote_game_btn);
         clickedForVote = false;
@@ -131,6 +135,7 @@ public class GamesActivity extends AppCompatActivity {
                             listView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                             if(gamesList.isEmpty()){
                                 gamesList.add(new Game(getText(R.string.games_no_games_suggested).toString(), 0));
+                                gamesLabel.setText(R.string.games_no_more_votes_no_games);
                             } else if(gamesList.size() > 3) {
                                 for(int i = 0; i <= gamesList.size() - 1; i++){
                                     if(i > 2){
@@ -339,6 +344,29 @@ public class GamesActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        suggestedGame.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if(charSequence.length() == 0){
+                    suggestGame.setAlpha(0.3f);
+                    suggestGame.setClickable(false);
+                } else {
+                    suggestGame.setAlpha(1f);
+                    suggestGame.setClickable(true);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
 
             }
         });

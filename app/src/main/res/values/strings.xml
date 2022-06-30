@@ -186,7 +186,8 @@
     <string name="games_vote_not_same_game">You can\'t vote for the same Game twice!</string>
     <string name="games_vote_success">Voted successfully!</string>
     <string name="games_end_of_voting">End of Voting:</string>
-    <string name="games_no_more_votes">No more Votes/ Suggestions! \nGames have been chosen!</string>
+    <string name="games_no_more_votes">Voting ended! \nGames have been chosen!</string>
+    <string name="games_no_more_votes_no_games">Voting ended! \nNo Game suggested!</string>
     <string name="games_meeting_canceled">Meeting has been canceled!</string>
     <string name="late_time_already_set_5_min">Your Latetime is already set to 5 Minutes!</string>
     <string name="late_time_set_to_5_min">Your Latetime has been set to 5 Minutes!</string>
@@ -212,7 +213,7 @@
     <string name="late_time_already_set_custom_time2">Minutes!</string>
     <string name="late_time_set_to_custom_time1">Your Latetime has been set to</string>
     <string name="late_time_set_to_custom_time2">Minutes!</string>
-        <string name="late_time_changed_to_custom_time1">Your Latetime has been changed to</string>
+    <string name="late_time_changed_to_custom_time1">Your Latetime has been changed to</string>
     <string name="late_time_changed_to_custom_time2">Minutes!</string>
     <string name="late_time_custom_time_title1">Late for</string>
     <string name="late_time_custom_time_title2">Minutes</string>
@@ -259,6 +260,12 @@
     <string name="account_data_update_title">Update Account Data</string>
     <string name="account_data_update_msg">Do you want to update your Account Data?</string>
     <string name="notification">HEADS_UP_NOTIFICATION</string>
+    <string name="notification_next_meeting_detail_changes_title">The Host made some Changes to the Meeting Details of the next Gamenight. Click here to check!</string>
+    <string name="notification_next_meeting_detail_changes">The Host made some Changes to the Meeting Details of the next Gamenight. Click here to check!</string>
+    <string name="notification_new_rating_title">New Rating Title</string>
+    <string name="notification_new_rating">New Rating Msg</string>
+    <string name="notification_changed_rating_title">changed Rating Title</string>
+    <string name="notification_changed_rating">changed Rating Msg</string>
 
     <string name="mon">Monday</string>
     <string name="tue">Tuesday</string>

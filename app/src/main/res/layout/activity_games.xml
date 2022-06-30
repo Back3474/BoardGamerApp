@@ -22,7 +22,7 @@
             android:layout_marginStart="10dp"
             android:layout_marginTop="10dp"
             android:layout_marginEnd="10dp"
-            android:text="@string/games_sug_games"
+            android:text="@string/main_games"
             android:textSize="24sp"
             android:textStyle="bold" />
 
