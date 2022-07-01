@@ -14,11 +14,17 @@ import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
 public class PushNotificationService extends FirebaseMessagingService {
+    String user = "USER";
 
     @Override
     public void onMessageReceived(@NonNull RemoteMessage message) {
@@ -29,6 +35,25 @@ public class PushNotificationService extends FirebaseMessagingService {
         String title = getString(getResources().getIdentifier(titleRaw, "string", getPackageName()));
         String textRaw = message.getData().get("body").toString();
         String text = getString(getResources().getIdentifier(textRaw, "string", getPackageName()));
+
+        if(message.getData().containsKey("uid")){
+            String uid = message.getData().get("uid").toString();
+            DatabaseReference ref = FirebaseDatabase
+                    .getInstance("https://board-gamer-app-ff958-default-rtdb.firebaseio.com")
+                    .getReference("users/" + uid);
+            ref.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    user = snapshot.child("firstname").getValue().toString() + " " + snapshot.child("lastname").getValue().toString();
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+            text = user + " " + text;
+        }
 
 
         final String CHANNEL_ID = "HEADS_UP_NOTIFICATION";

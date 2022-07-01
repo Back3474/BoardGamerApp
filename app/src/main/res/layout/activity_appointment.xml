@@ -129,6 +129,12 @@
             </ViewSwitcher>
 
 
+            <View
+                android:id="@+id/divider6"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="?android:attr/listDivider" />
+
             <TextView
                 android:id="@+id/label_meeting_nxt_mtng_host"
                 android:layout_width="match_parent"
@@ -152,6 +158,12 @@
                 android:text="@string/label_meeting_nxt_mtng_host"
                 android:textSize="24sp"
                 android:textStyle="bold" />
+
+            <View
+                android:id="@+id/divider7"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="?android:attr/listDivider" />
 
             <TextView
                 android:id="@+id/label_meeting_nxt_mtng_address"

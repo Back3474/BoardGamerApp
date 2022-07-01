@@ -262,10 +262,12 @@
     <string name="notification">HEADS_UP_NOTIFICATION</string>
     <string name="notification_next_meeting_detail_changes_title">The Host made some Changes to the Meeting Details of the next Gamenight. Click here to check!</string>
     <string name="notification_next_meeting_detail_changes">The Host made some Changes to the Meeting Details of the next Gamenight. Click here to check!</string>
-    <string name="notification_new_rating_title">New Rating Title</string>
-    <string name="notification_new_rating">New Rating Msg</string>
-    <string name="notification_changed_rating_title">changed Rating Title</string>
-    <string name="notification_changed_rating">changed Rating Msg</string>
+    <string name="notification_new_rating_title">New Rating</string>
+    <string name="notification_new_rating">rated the last Gamenight!</string>
+    <string name="notification_changed_rating_title">Rating changed</string>
+    <string name="notification_changed_rating">changed his Rating!</string>
+    <string name="notification_not_taking_part_title">Gamenight Participates</string>
+    <string name="notification_not_taking_part">can\'t participate in the next Gamenight!</string>
 
     <string name="mon">Monday</string>
     <string name="tue">Tuesday</string>

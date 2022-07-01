@@ -77,6 +77,7 @@
                         android:layout_marginEnd="10dp"
                         android:layout_marginBottom="5dp"
                         android:clickable="false"
+                        android:gravity="center_vertical"
                         android:text="@string/next_meeting"
                         android:textSize="22sp"
                         android:textStyle="bold" />
@@ -90,16 +91,23 @@
 
                     <ImageButton
                         android:id="@+id/editMeetingBtn"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
                         android:layout_marginTop="10dp"
                         android:layout_marginEnd="10dp"
+                        android:layout_marginBottom="10dp"
                         android:layout_weight="1"
                         android:background="#0000"
                         android:contentDescription="@string/main_edit_btn"
                         android:scaleType="fitEnd"
                         app:srcCompat="@drawable/edit_pencil" />
                 </TableRow>
+
+                <View
+                    android:id="@+id/divider9"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="?android:attr/listDivider" />
 
                 <TextView
                     android:id="@+id/nxt_mtng_date"
@@ -141,6 +149,12 @@
                     android:textSize="24sp"
                     android:textStyle="bold" />
 
+                <View
+                    android:id="@+id/divider"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="?android:attr/listDivider" />
+
                 <TextView
                     android:id="@+id/nxt_mtng_host"
                     android:layout_width="match_parent"
@@ -166,6 +180,12 @@
                     android:text="@string/main_mtng_host"
                     android:textSize="24sp"
                     android:textStyle="bold" />
+
+                <View
+                    android:id="@+id/divider2"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="?android:attr/listDivider" />
 
                 <TextView
                     android:id="@+id/nxt_mtng_address"
@@ -193,6 +213,12 @@
                     android:textSize="24sp"
                     android:textStyle="bold" />
 
+                <View
+                    android:id="@+id/divider3"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="?android:attr/listDivider" />
+
                 <TextView
                     android:id="@+id/next_mtng_participants"
                     android:layout_width="match_parent"
@@ -214,6 +240,12 @@
                     android:layout_marginBottom="5dp"
                     android:textSize="16sp"
                     android:textStyle="bold" />
+
+                <View
+                    android:id="@+id/divider4"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="?android:attr/listDivider" />
 
                 <TextView
                     android:id="@+id/late_time_label"
