@@ -260,8 +260,8 @@
     <string name="account_data_update_title">Update Account Data</string>
     <string name="account_data_update_msg">Do you want to update your Account Data?</string>
     <string name="notification">HEADS_UP_NOTIFICATION</string>
-    <string name="notification_next_meeting_detail_changes_title">The Host made some Changes to the Meeting Details of the next Gamenight. Click here to check!</string>
-    <string name="notification_next_meeting_detail_changes">The Host made some Changes to the Meeting Details of the next Gamenight. Click here to check!</string>
+    <string name="notification_next_meeting_detail_changes_title">Gamenight Meeting</string>
+    <string name="notification_next_meeting_detail_changes">made some Changes to the Meeting Details of the next Gamenight. Click here to check!</string>
     <string name="notification_new_rating_title">New Rating</string>
     <string name="notification_new_rating">rated the last Gamenight!</string>
     <string name="notification_changed_rating_title">Rating changed</string>

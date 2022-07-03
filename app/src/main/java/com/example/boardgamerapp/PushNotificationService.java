@@ -1,5 +1,6 @@
 package com.example.boardgamerapp;
 
+import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -24,13 +25,12 @@ import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
 public class PushNotificationService extends FirebaseMessagingService {
-    String user = "USER";
 
     @Override
     public void onMessageReceived(@NonNull RemoteMessage message) {
         super.onMessageReceived(message);
 
-        String id = message.getData().get("msgId").toString();
+        String msgId = message.getData().get("msgId").toString();
         String titleRaw = message.getData().get("title").toString();
         String title = getString(getResources().getIdentifier(titleRaw, "string", getPackageName()));
         String textRaw = message.getData().get("body").toString();
@@ -38,23 +38,9 @@ public class PushNotificationService extends FirebaseMessagingService {
 
         if(message.getData().containsKey("uid")){
             String uid = message.getData().get("uid").toString();
-            DatabaseReference ref = FirebaseDatabase
-                    .getInstance("https://board-gamer-app-ff958-default-rtdb.firebaseio.com")
-                    .getReference("users/" + uid);
-            ref.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    user = snapshot.child("firstname").getValue().toString() + " " + snapshot.child("lastname").getValue().toString();
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-
-                }
-            });
-            text = user + " " + text;
+            String uName = message.getData().get("uName").toString();
+            text = uName + " " + text;
         }
-
 
         final String CHANNEL_ID = "HEADS_UP_NOTIFICATION";
         NotificationChannel channel = new NotificationChannel(
@@ -71,19 +57,28 @@ public class PushNotificationService extends FirebaseMessagingService {
                 .setAutoCancel(true)
                 .setStyle(new Notification.BigTextStyle().bigText(text).setBigContentTitle(Html.fromHtml("<b>"+title+"</b>", Html.FROM_HTML_MODE_COMPACT)));
 
-        if(id.equals("next_meeting")){
+        if(msgId.equals("next_meeting")){
             Intent resultIntent = new Intent(getApplicationContext(), MainActivity.class);
             resultIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             PendingIntent resultPendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, resultIntent, PendingIntent.FLAG_CANCEL_CURRENT);
             notification.setContentIntent(resultPendingIntent);
-        } else if(id.equals("rating")){
+        } else if(msgId.equals("rating")){
             Intent resultIntent = new Intent(getApplicationContext(), RatingActivity.class);
             resultIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             PendingIntent resultPendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, resultIntent, PendingIntent.FLAG_CANCEL_CURRENT);
             notification.setContentIntent(resultPendingIntent);
         }
 
-        NotificationManagerCompat.from(this).notify(1, notification.build());
+        SharedPreferences prefs = getSharedPreferences(Activity.class.getSimpleName(), Context.MODE_PRIVATE);
+        int notificationNumber = prefs.getInt("notificationNumber", 0);
+
+        NotificationManagerCompat.from(this).notify(notificationNumber, notification.build());
+
+        SharedPreferences.Editor editor = prefs.edit();
+        notificationNumber++;
+        editor.putInt("notificationNumber", notificationNumber);
+        editor.commit();
     }
+
 
 }

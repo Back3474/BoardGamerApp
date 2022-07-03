@@ -163,7 +163,6 @@ public class AppointmentActivity extends AppCompatActivity {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                                         ArrayList users = new ArrayList<String>();
-                                        refNextMeeting.child("participants").removeValue();
                                         for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                                             String userUid = dataSnapshot.child("id").getValue().toString();
                                             String userName = dataSnapshot.child("firstname").getValue().toString() + " " + dataSnapshot.child("lastname").getValue().toString();
@@ -188,6 +187,7 @@ public class AppointmentActivity extends AppCompatActivity {
                                             nextMeetingDate = nextMeetingDate.with(TemporalAdjusters.next(DayOfWeek.of(dayOfWeek)));
                                         }
 
+                                        refNextMeeting.child("hostId").setValue(snapshot.child(newHost).child("id").getValue().toString());
                                         refNextMeeting.child("host").setValue(snapshot.child(newHost).child("firstname").getValue().toString() + " " + snapshot.child(newHost).child("lastname").getValue().toString());
                                         refNextMeeting.child("address").setValue(snapshot.child(newHost).child("address").getValue().toString());
 
@@ -273,7 +273,6 @@ public class AppointmentActivity extends AppCompatActivity {
                                         @Override
                                         public void onDataChange(@NonNull DataSnapshot snapshot) {
                                             ArrayList users = new ArrayList<String>();
-                                            refNextMeeting.child("participants").removeValue();
                                             for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                                                 String userUid = dataSnapshot.child("id").getValue().toString();
                                                 String userName = dataSnapshot.child("firstname").getValue().toString() + " " + dataSnapshot.child("lastname").getValue().toString();
@@ -298,6 +297,7 @@ public class AppointmentActivity extends AppCompatActivity {
                                                 nextMeetingDate = nextMeetingDate.with(TemporalAdjusters.next(DayOfWeek.of(dayOfWeek)));
                                             }
 
+                                            refNextMeeting.child("hostId").setValue(snapshot.child(newHost).child("id").getValue().toString());
                                             refNextMeeting.child("host").setValue(snapshot.child(newHost).child("firstname").getValue().toString() + " " + snapshot.child(newHost).child("lastname").getValue().toString());
                                             refNextMeeting.child("address").setValue(snapshot.child(newHost).child("address").getValue().toString());
 
@@ -657,44 +657,22 @@ public class AppointmentActivity extends AppCompatActivity {
 
                             newMeeting.clear();
                             if(today.compareTo(newLocalDate) < 0){
+
                                 newMeeting.put("date", newDate);
                                 newMeeting.put("day", dayOfWeek);
-                            }
-                            if(!selectTimeBtn.getText().equals(R.string.appointment_select_time)){
-                                newMeeting.put("hour", newHour);
-                                newMeeting.put("minute", newMinute);
-                            }
-                            if(!TextUtils.isEmpty(editAddress.getText())){
-                                if(!addressValidates(newAddress)){
-                                    Toast.makeText(AppointmentActivity.this, R.string.appointment_invalid_address, Toast.LENGTH_SHORT).show();
-                                } else {
-                                    newMeeting.put("address", newAddress);
-                                    ref.updateChildren(newMeeting).addOnCompleteListener(new OnCompleteListener() {
-                                        @Override
-                                        public void onComplete(@NonNull Task task) {
-                                            if(task.isSuccessful()){
-                                                hostLabel.setVisibility(View.VISIBLE);
-                                                nxtMeetingHost.setVisibility(View.VISIBLE);
-                                                viewSwitcherDay.showPrevious();
-                                                viewSwitcherTime.showPrevious();
-                                                viewSwitcherAddress.showPrevious();
-                                                clickedForEdit = false;
-                                                editMeetingBtn.setText(R.string.meeting_edit_mtng_btn);
-                                                confirmChanges.setVisibility(View.GONE);
-                                                selectDateBtn.setText(R.string.appointment_select_date);
-                                                editAddress.setText(null);
-                                                selectTimeBtn.setText(R.string.appointment_select_time);
-                                                cancelMeetingBtn.setAlpha(1f);
-                                                cancelMeetingBtn.setClickable(true);
-                                                confirmMeetingEndBtn.setAlpha(1f);
-                                                confirmMeetingEndBtn.setClickable(true);
-                                            } else {
-                                                Toast.makeText(AppointmentActivity.this, "failed", Toast.LENGTH_SHORT).show();
-                                            }
-                                        }
-                                    });
+
+                                if(!selectTimeBtn.getText().toString().equals(R.string.appointment_select_time)){
+                                    newMeeting.put("hour", newHour);
+                                    newMeeting.put("minute", newMinute);
                                 }
-                            } else {
+                                if(!TextUtils.isEmpty(editAddress.getText())){
+                                    if(!addressValidates(newAddress)){
+                                        Toast.makeText(AppointmentActivity.this, R.string.appointment_invalid_address, Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        newMeeting.put("address", newAddress);
+                                    }
+                                }
+
                                 ref.updateChildren(newMeeting).addOnCompleteListener(new OnCompleteListener() {
                                     @Override
                                     public void onComplete(@NonNull Task task) {
@@ -719,9 +697,12 @@ public class AppointmentActivity extends AppCompatActivity {
                                         }
                                     }
                                 });
+                                int changesN = changes + 1;
+                                ref.child("changes").setValue(changesN);
+                            } else {
+                                Toast.makeText(AppointmentActivity.this, R.string.appointment_select_date_future, Toast.LENGTH_SHORT).show();
                             }
-                            int changesN = changes + 1;
-                            ref.child("changes").setValue(changesN);
+
                         }
                     });
                     builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {

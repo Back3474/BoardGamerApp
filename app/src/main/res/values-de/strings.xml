@@ -261,7 +261,7 @@
     <string name="account_data_update_msg">Möchtest du deine Kontodaten aktualisieren?</string>
     <string name="notification">HEADS_UP_NOTIFICATION</string>
     <string name="notification_next_meeting_detail_changes_title">Spieleabend-Termin</string>
-    <string name="notification_next_meeting_detail_changes">Der Gastgeber hat Änderungen am Spieleabend-Termin vorgenommen.</string>
+    <string name="notification_next_meeting_detail_changes">hat Änderungen am Spieleabend-Termin vorgenommen.</string>
     <string name="notification_new_rating_title">Neue Bewertung</string>
     <string name="notification_new_rating">hat den letzten Spieleabend bewertet!</string>
     <string name="notification_changed_rating_title">Bewertung geändert</string>
