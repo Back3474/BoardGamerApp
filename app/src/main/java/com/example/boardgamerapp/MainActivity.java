@@ -25,10 +25,14 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
 
+import java.lang.reflect.Array;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuItemClickListener {
     private ImageButton menu, editMeetingBtn;
@@ -41,7 +45,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
     private String date, userLatetime_txt, allAdmins;
     private int hour, minute;
     private HashMap<String, Object> participants;
-    private Boolean meetingCanceled, isHost;
+    private Boolean meetingCanceled, isHost, isAdmin;
 
 
 
@@ -55,6 +59,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         firebaseMessaging.subscribeToTopic("rating_changed");
         firebaseMessaging.subscribeToTopic("new_rating");
         firebaseMessaging.subscribeToTopic("not_taking_part");
+        firebaseMessaging.subscribeToTopic("late_participant");
 
         overridePendingTransition(com.google.android.material.R.anim.abc_popup_enter, com.google.android.material.R.anim.abc_popup_exit);
 
@@ -140,13 +145,11 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                 if(meetingCanceled){
                     notTakingPart.setText(R.string.appointment_meeting_canceled_label);
                     notTakingPart.setTextColor(Color.RED);
+                } else if(!snapshot.child("participants").child(auth.getUid()).child("isTakingPart").getValue(Boolean.class)){
+                    notTakingPart.setText(R.string.user_not_taking_part);
+                    notTakingPart.setTextColor(Color.RED);
                 } else {
-                    if(!snapshot.child("participants").hasChild(auth.getUid())){
-                        notTakingPart.setText(R.string.user_not_taking_part);
-                        notTakingPart.setTextColor(Color.RED);
-                    } else {
-                        notTakingPart.setText(null);
-                    }
+                    notTakingPart.setText(null);
                 }
                 findViewById(R.id.loadingPanelMain).setVisibility(View.GONE);
                 findViewById(R.id.linearLayoutMain).setVisibility(View.VISIBLE);
@@ -165,23 +168,26 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                 allParticipants.setText(null);
                 lateParticipants.setText(null);
                 for(DataSnapshot dataSnapshot : snapshot.getChildren()){
-                    String uid = dataSnapshot.getKey().toString();
-                    String name = dataSnapshot.child("name").getValue().toString();
-                    participants.put(uid, name);
-                    String newAllParticipants;
-                    if(TextUtils.isEmpty(allParticipants.getText())){
-                        newAllParticipants = name;
-                    } else {
-                        newAllParticipants = allParticipants.getText() + ", " + name;
-                    }
-                    allParticipants.setText(newAllParticipants);
-                    if(dataSnapshot.hasChild("latetime")){
-                        if(dataSnapshot.child("latetime").getValue(Integer.class) != 0){
-                            userLatetime_txt = String.valueOf(dataSnapshot.child("latetime").getValue(Integer.class));
-                            if(TextUtils.isEmpty(lateParticipants.getText())){
-                                lateParticipants.setText(name + ": " + userLatetime_txt + " " + getText(R.string.late_late_participants_min));
-                            } else {
-                                lateParticipants.setText(lateParticipants.getText().toString() + ", " + name + ": " + userLatetime_txt + " " + getText(R.string.late_late_participants_min));
+                    if(dataSnapshot.child("isTakingPart").getValue(Boolean.class)){
+                        String uid = dataSnapshot.getKey().toString();
+                        String name = dataSnapshot.child("name").getValue().toString();
+                        participants.put(uid, name);
+
+                        String newAllParticipants;
+                        if(TextUtils.isEmpty(allParticipants.getText())){
+                            newAllParticipants = name;
+                        } else {
+                            newAllParticipants = allParticipants.getText() + ", " + name;
+                        }
+                        allParticipants.setText(newAllParticipants);
+                        if(dataSnapshot.hasChild("latetime")){
+                            if(dataSnapshot.child("latetime").getValue(Integer.class) != 0){
+                                userLatetime_txt = String.valueOf(dataSnapshot.child("latetime").getValue(Integer.class));
+                                if(TextUtils.isEmpty(lateParticipants.getText())){
+                                    lateParticipants.setText(name + ": " + userLatetime_txt + " " + getText(R.string.late_late_participants_min));
+                                } else {
+                                    lateParticipants.setText(lateParticipants.getText().toString() + ", " + name + ": " + userLatetime_txt + " " + getText(R.string.late_late_participants_min));
+                                }
                             }
                         }
                     }
@@ -208,7 +214,9 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 greetText.setText(getText(R.string.greetText) +" "+ snapshot.child("firstname").getValue().toString()+"!");
                 isHost = snapshot.child("isHost").getValue(Boolean.class);
-                if(isHost == false ){
+                isAdmin = snapshot.child("isAdmin").getValue(Boolean.class);
+
+                if(isHost == false){
                     editMeetingBtn.setVisibility(View.GONE);
                 }
                 if(snapshot.child("status").getValue().toString().equals("deactivated")){
@@ -230,7 +238,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         if(isHost){
                             Toast.makeText(MainActivity.this, R.string.main_cannot_take_part_host, Toast.LENGTH_SHORT).show();
-                        }else if(!snapshot.hasChild(auth.getUid())){
+                        }else if(!snapshot.child(auth.getUid()).child("isTakingPart").getValue(Boolean.class)){
                             Toast.makeText(MainActivity.this, R.string.user_not_taking_part_already, Toast.LENGTH_SHORT).show();
                         } else if(meetingCanceled){
                             Toast.makeText(MainActivity.this, R.string.appointment_meeting_canceled_label, Toast.LENGTH_SHORT).show();
@@ -242,7 +250,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                             builder.setPositiveButton(R.string.discard_yes, new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i) {
-                                    refParticipants.child(auth.getUid()).removeValue();
+                                    refParticipants.child(auth.getUid()).child("isTakingPart").setValue(false);
                                 }
                             });
                             builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
@@ -388,6 +396,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                                 firebaseMessaging.unsubscribeFromTopic("rating_changed");
                                 firebaseMessaging.unsubscribeFromTopic("new_rating");
                                 firebaseMessaging.unsubscribeFromTopic("not_taking_part");
+                                firebaseMessaging.unsubscribeFromTopic("late_participant");
                                 startActivity(new Intent(MainActivity.this, LoginActivity.class));
                                 finish();
                             }

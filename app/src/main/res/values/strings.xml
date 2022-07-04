@@ -226,7 +226,7 @@
     <string name="appointment_confirm_changes">Confrim Changes</string>
     <string name="appointment_cancel">Cancel</string>
     <string name="appointment_enter_new_address">Enter new Address (Street &amp; Number, Code &amp; City)</string>
-    <string name="appointment_meeting_canceled_label">This Meeting has been canceled!</string>
+    <string name="appointment_meeting_canceled_label">Gamenight canceled!</string>
     <string name="appointment_confirm_meeting_changes_title">Confirm Changes</string>
     <string name="appointment_confirm_meeting_changes_msg">Do you want to confirm your Changes?</string>
     <string name="appointment_change_meeting_details_title">Change Appointment</string>
@@ -268,6 +268,8 @@
     <string name="notification_changed_rating">changed his Rating!</string>
     <string name="notification_not_taking_part_title">Gamenight Participates</string>
     <string name="notification_not_taking_part">can\'t participate in the next Gamenight!</string>
+    <string name="notification_late_participant_title">Late Participant</string>
+    <string name="notification_late_participant">is going to be late for</string>
 
     <string name="mon">Monday</string>
     <string name="tue">Tuesday</string>

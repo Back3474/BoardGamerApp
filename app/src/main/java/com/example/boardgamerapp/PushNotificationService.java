@@ -24,6 +24,8 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
+import java.util.Locale;
+
 public class PushNotificationService extends FirebaseMessagingService {
 
     @Override
@@ -40,6 +42,11 @@ public class PushNotificationService extends FirebaseMessagingService {
             String uid = message.getData().get("uid").toString();
             String uName = message.getData().get("uName").toString();
             text = uName + " " + text;
+        }
+
+        if(message.getData().containsKey("latetime")){
+            String latetime = message.getData().get("latetime").toString();
+            text = text + " " + latetime + " " + getText(R.string.late_late_participants_min);
         }
 
         final String CHANNEL_ID = "HEADS_UP_NOTIFICATION";

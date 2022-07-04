@@ -226,7 +226,7 @@
     <string name="appointment_confirm_changes">Änderungen bestätigen</string>
     <string name="appointment_cancel">abbrechen</string>
     <string name="appointment_enter_new_address">neue Adresse eingeben (Straße &amp; Hausnr., PLZ &amp; Ort)</string>
-    <string name="appointment_meeting_canceled_label">Dieses Treffen wurde abgesagt!</string>
+    <string name="appointment_meeting_canceled_label">Spieleabend abgesagt!</string>
     <string name="appointment_confirm_meeting_changes_title">Änderungen bestätigen</string>
     <string name="appointment_confirm_meeting_changes_msg">Möchtest du deine Änderungen bestätigen?</string>
     <string name="appointment_change_meeting_details_title">Termin ändern</string>
@@ -268,6 +268,8 @@
     <string name="notification_changed_rating">hat seine Bewertung geändert!</string>
     <string name="notification_not_taking_part_title">Spieleabend Teilnehmer</string>
     <string name="notification_not_taking_part">kann am Spieleabend nicht teilnehmen!</string>
+    <string name="notification_late_participant_title">Verspätung Teilnehmer</string>
+    <string name="notification_late_participant">verspätet sich um</string>
 
 
     <string name="mon">Montag</string>

@@ -1,9 +1,6 @@
 package com.example.boardgamerapp;
 
-import static java.time.DayOfWeek.MONDAY;
 import static java.time.temporal.ChronoUnit.DAYS;
-import static java.util.Calendar.SUNDAY;
-import static java.util.Calendar.WEDNESDAY;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -39,18 +36,15 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.sql.Date;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.Temporal;
-import java.time.temporal.TemporalAdjuster;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -147,6 +141,11 @@ public class AppointmentActivity extends AppCompatActivity {
                 nxtMeetingHost.setText(snapshot.child("host").getValue().toString());
                 nxtMeetingAddress.setText(snapshot.child("address").getValue().toString());
 
+                List<String> nextMeetingParticipants = new ArrayList<String>();
+                for(DataSnapshot dataSnapshot : snapshot.child("participants").getChildren()){
+                    nextMeetingParticipants.add(dataSnapshot.getKey());
+                }
+
                 View.OnClickListener generateNewMeetingOnClickListener = new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -162,14 +161,25 @@ public class AppointmentActivity extends AppCompatActivity {
                                 refUsers.addValueEventListener(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                        ArrayList users = new ArrayList<String>();
+                                        List users = new ArrayList();
                                         for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                                             String userUid = dataSnapshot.child("id").getValue().toString();
                                             String userName = dataSnapshot.child("firstname").getValue().toString() + " " + dataSnapshot.child("lastname").getValue().toString();
                                             refNextMeeting.child("participants").child(userUid).child("name").setValue(userName);
+                                            refNextMeeting.child("participants").child(userUid).child("isTakingPart").setValue(true);
                                             refNextMeeting.child("participants").child(userUid).child("latetime").removeValue();
                                             users.add(userUid);
                                         }
+
+                                        for(int i = 0; i < users.size(); i++){
+                                            String check = users.get(i).toString();
+                                            for(String uid : nextMeetingParticipants){
+                                                if(!uid.equals(check)){
+                                                    refNextMeeting.child("participants").child(uid).removeValue();
+                                                }
+                                            }
+                                        }
+
                                         Collections.sort(users, String.CASE_INSENSITIVE_ORDER);
                                         int currentHostIndex = users.indexOf(auth.getUid());
                                         String newHost;
@@ -232,9 +242,6 @@ public class AppointmentActivity extends AppCompatActivity {
                 View.OnClickListener confirmMeetingEndOnClickListener = new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        date = snapshot.child("date").getValue().toString();
-                        inputDate = LocalDate.parse(date);
-
                         if (DAYS.between(today, inputDate) > 0) {
                             Toast.makeText(AppointmentActivity.this, R.string.appointment_confrim_end_error, Toast.LENGTH_LONG).show();
                         } else {
@@ -252,9 +259,11 @@ public class AppointmentActivity extends AppCompatActivity {
                                         public void onDataChange(@NonNull DataSnapshot snapshot) {
                                             Map lastMtngParticipants = new HashMap<String, String>();
                                             for (DataSnapshot dataSnapshot : snapshot.child("participants").getChildren()) {
-                                                String uid = dataSnapshot.getKey();
-                                                String name = dataSnapshot.child("name").getValue().toString();
-                                                lastMtngParticipants.put(uid, name);
+                                                if(dataSnapshot.child("isTakingPart").getValue(Boolean.class)){
+                                                    String uid = dataSnapshot.getKey();
+                                                    String name = dataSnapshot.child("name").getValue().toString();
+                                                    lastMtngParticipants.put(uid, name);
+                                                }
                                             }
                                             refLastGamenight.child("participants").removeValue();
                                             refLastGamenight.child("participants").setValue(lastMtngParticipants);
@@ -277,9 +286,18 @@ public class AppointmentActivity extends AppCompatActivity {
                                                 String userUid = dataSnapshot.child("id").getValue().toString();
                                                 String userName = dataSnapshot.child("firstname").getValue().toString() + " " + dataSnapshot.child("lastname").getValue().toString();
                                                 refNextMeeting.child("participants").child(userUid).child("name").setValue(userName);
+                                                refNextMeeting.child("participants").child(userUid).child("isTakingPart").setValue(true);
                                                 refNextMeeting.child("participants").child(userUid).child("latetime").removeValue();
                                                 users.add(userUid);
                                             }
+
+                                            for(int i = 0; i < nextMeetingParticipants.size(); i++){
+                                                String uid = nextMeetingParticipants.get(i);
+                                                if(!users.contains(uid)){
+                                                    refNextMeeting.child("participants").child(uid).removeValue();
+                                                }
+                                            }
+
                                             Collections.sort(users, String.CASE_INSENSITIVE_ORDER);
                                             int currentHostIndex = users.indexOf(auth.getUid());
                                             String newHost;
