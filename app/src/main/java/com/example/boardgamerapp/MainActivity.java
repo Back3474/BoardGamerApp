@@ -60,6 +60,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         firebaseMessaging.subscribeToTopic("new_rating");
         firebaseMessaging.subscribeToTopic("not_taking_part");
         firebaseMessaging.subscribeToTopic("late_participant");
+        firebaseMessaging.subscribeToTopic("new_game");
 
         overridePendingTransition(com.google.android.material.R.anim.abc_popup_enter, com.google.android.material.R.anim.abc_popup_exit);
 
@@ -100,7 +101,6 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         DatabaseReference refParticipants = db.getReference("next meeting/participants");
         DatabaseReference refNextMeeting = db.getReference("next meeting");
         DatabaseReference refCurrentUser = db.getReference("users/"+auth.getUid());
-
         refUser.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -397,6 +397,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                                 firebaseMessaging.unsubscribeFromTopic("new_rating");
                                 firebaseMessaging.unsubscribeFromTopic("not_taking_part");
                                 firebaseMessaging.unsubscribeFromTopic("late_participant");
+                                firebaseMessaging.unsubscribeFromTopic("new_game");
                                 startActivity(new Intent(MainActivity.this, LoginActivity.class));
                                 finish();
                             }

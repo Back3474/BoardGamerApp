@@ -1,6 +1,7 @@
 package com.example.boardgamerapp;
 
 import static java.time.temporal.ChronoUnit.DAYS;
+import static java.time.temporal.ChronoUnit.HOURS;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -38,6 +39,8 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
@@ -125,7 +128,8 @@ public class AppointmentActivity extends AppCompatActivity {
             }
         });
 
-        refNextMeeting.addValueEventListener(new ValueEventListener() {
+        refNextMeeting.
+    addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 date = snapshot.child("date").getValue().toString();
@@ -167,7 +171,7 @@ public class AppointmentActivity extends AppCompatActivity {
                                             String userName = dataSnapshot.child("firstname").getValue().toString() + " " + dataSnapshot.child("lastname").getValue().toString();
                                             refNextMeeting.child("participants").child(userUid).child("name").setValue(userName);
                                             refNextMeeting.child("participants").child(userUid).child("isTakingPart").setValue(true);
-                                            refNextMeeting.child("participants").child(userUid).child("latetime").removeValue();
+                                            refNextMeeting.child("participants").child(userUid).child("latetime").setValue(0);
                                             users.add(userUid);
                                         }
 
@@ -242,7 +246,10 @@ public class AppointmentActivity extends AppCompatActivity {
                 View.OnClickListener confirmMeetingEndOnClickListener = new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        if (DAYS.between(today, inputDate) > 0) {
+                        LocalDateTime now = LocalDateTime.now();
+                        LocalTime meetingTime = LocalTime.of(hour, minute);
+                        LocalDateTime meetingDateTime = LocalDateTime.of(inputDate, meetingTime);
+                        if (HOURS.between(meetingDateTime, now) < 2) {
                             Toast.makeText(AppointmentActivity.this, R.string.appointment_confrim_end_error, Toast.LENGTH_LONG).show();
                         } else {
                             AlertDialog.Builder builder = new AlertDialog.Builder(AppointmentActivity.this);
@@ -287,7 +294,7 @@ public class AppointmentActivity extends AppCompatActivity {
                                                 String userName = dataSnapshot.child("firstname").getValue().toString() + " " + dataSnapshot.child("lastname").getValue().toString();
                                                 refNextMeeting.child("participants").child(userUid).child("name").setValue(userName);
                                                 refNextMeeting.child("participants").child(userUid).child("isTakingPart").setValue(true);
-                                                refNextMeeting.child("participants").child(userUid).child("latetime").removeValue();
+                                                refNextMeeting.child("participants").child(userUid).child("latetime").setValue(0);
                                                 users.add(userUid);
                                             }
 
