@@ -60,7 +60,7 @@ public class AppointmentActivity extends AppCompatActivity {
     private DateTimeFormatter dtf;
     private Button editMeetingBtn, cancelMeetingBtn, confirmMeetingEndBtn, selectTimeBtn, selectDateBtn;
     private TextView nxtMeetingDay, nxtMeetingTime, nxtMeetingHost, nxtMeetingAddress, meetingLabel, meetingIsCanceled, hostLabel;
-    private Boolean meetingCanceled, clickedForEdit;
+    private Boolean meetingCanceled, clickedForEdit, done, dateSelected, timeSelected;
     private ViewSwitcher viewSwitcherDay, viewSwitcherTime, viewSwitcherAddress;
     private ImageButton confirmChanges;
     private EditText editAddress;
@@ -90,6 +90,8 @@ public class AppointmentActivity extends AppCompatActivity {
         meetingIsCanceled = findViewById(R.id.meetingIsCanceled_txt);
         meetingCanceled = true;
         clickedForEdit = false;
+        dateSelected = false;
+        timeSelected = false;
         dtf = DateTimeFormatter.ofPattern((String) getText(R.string.date_format));
         today = LocalDate.now();
         viewSwitcherDay = findViewById(R.id.dayViewSwitcher);
@@ -103,6 +105,7 @@ public class AppointmentActivity extends AppCompatActivity {
         appointmentLoading = findViewById(R.id.loadingPanelAppointment);
         appointmentLoading.setVisibility(View.GONE);
         initDatePicker();
+
 
         auth = FirebaseAuth.getInstance();
         db = FirebaseDatabase.getInstance("https://board-gamer-app-ff958-default-rtdb.firebaseio.com");
@@ -128,8 +131,7 @@ public class AppointmentActivity extends AppCompatActivity {
             }
         });
 
-        refNextMeeting.
-    addValueEventListener(new ValueEventListener() {
+        refNextMeeting.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 date = snapshot.child("date").getValue().toString();
@@ -165,7 +167,7 @@ public class AppointmentActivity extends AppCompatActivity {
                                 refUsers.addValueEventListener(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                        List users = new ArrayList();
+                                        ArrayList users = new ArrayList<String>();
                                         for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                                             String userUid = dataSnapshot.child("id").getValue().toString();
                                             String userName = dataSnapshot.child("firstname").getValue().toString() + " " + dataSnapshot.child("lastname").getValue().toString();
@@ -175,12 +177,10 @@ public class AppointmentActivity extends AppCompatActivity {
                                             users.add(userUid);
                                         }
 
-                                        for(int i = 0; i < users.size(); i++){
-                                            String check = users.get(i).toString();
-                                            for(String uid : nextMeetingParticipants){
-                                                if(!uid.equals(check)){
-                                                    refNextMeeting.child("participants").child(uid).removeValue();
-                                                }
+                                        for(int i = 0; i < nextMeetingParticipants.size(); i++){
+                                            String uid = nextMeetingParticipants.get(i);
+                                            if(!users.contains(uid)){
+                                                refNextMeeting.child("participants").child(uid).removeValue();
                                             }
                                         }
 
@@ -196,8 +196,8 @@ public class AppointmentActivity extends AppCompatActivity {
                                         }
 
                                         int dayOfWeek = getDayOfWeek(appointmentDefDay);
-                                        nextMeetingDate = inputDate.with(TemporalAdjusters.next(DayOfWeek.of(dayOfWeek)));
-                                        if(DAYS.between(inputDate, nextMeetingDate) < 5){
+                                        nextMeetingDate = today.with(TemporalAdjusters.next(DayOfWeek.of(dayOfWeek)));
+                                        if(DAYS.between(today, nextMeetingDate) < 5){
                                             nextMeetingDate = nextMeetingDate.with(TemporalAdjusters.next(DayOfWeek.of(dayOfWeek)));
                                         }
 
@@ -249,7 +249,7 @@ public class AppointmentActivity extends AppCompatActivity {
                         LocalDateTime now = LocalDateTime.now();
                         LocalTime meetingTime = LocalTime.of(hour, minute);
                         LocalDateTime meetingDateTime = LocalDateTime.of(inputDate, meetingTime);
-                        if (HOURS.between(meetingDateTime, now) < 2) {
+                        if (HOURS.between(meetingDateTime, now) < 0) {
                             Toast.makeText(AppointmentActivity.this, R.string.appointment_confrim_end_error, Toast.LENGTH_LONG).show();
                         } else {
                             AlertDialog.Builder builder = new AlertDialog.Builder(AppointmentActivity.this);
@@ -468,6 +468,7 @@ public class AppointmentActivity extends AppCompatActivity {
                                 @Override
                                 public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                                     confrimAllChanges();
+                                    dateSelected = true;
                                 }
 
                                 @Override
@@ -512,6 +513,7 @@ public class AppointmentActivity extends AppCompatActivity {
                                 @Override
                                 public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                                     confrimAllChanges();
+                                    timeSelected = true;
                                 }
 
                                 @Override
@@ -681,23 +683,55 @@ public class AppointmentActivity extends AppCompatActivity {
                             Map newMeeting = new HashMap<String, Object>();
 
                             newMeeting.clear();
-                            if(today.compareTo(newLocalDate) < 0){
+                            done = false;
 
-                                newMeeting.put("date", newDate);
-                                newMeeting.put("day", dayOfWeek);
-
-                                if(!selectTimeBtn.getText().toString().equals(R.string.appointment_select_time)){
-                                    newMeeting.put("hour", newHour);
-                                    newMeeting.put("minute", newMinute);
+                            if(dateSelected){
+                                if(today.compareTo(newLocalDate) < 0){
+                                    newMeeting.put("date", newDate);
+                                    newMeeting.put("day", dayOfWeek);
+                                    if(!TextUtils.isEmpty(editAddress.getText())){
+                                        if(!addressValidates(newAddress)){
+                                            Toast.makeText(AppointmentActivity.this, R.string.appointment_invalid_address, Toast.LENGTH_SHORT).show();
+                                        } else {
+                                            newMeeting.put("address", newAddress);
+                                            if(timeSelected){
+                                                newMeeting.put("hour", newHour);
+                                                newMeeting.put("minute", newMinute);
+                                                done = true;
+                                            } else {
+                                                done = true;
+                                            }
+                                        }
+                                    } else if(timeSelected){
+                                            newMeeting.put("hour", newHour);
+                                            newMeeting.put("minute", newMinute);
+                                            done = true;
+                                    } else {
+                                        done = true;
+                                    }
+                                } else {
+                                    Toast.makeText(AppointmentActivity.this, R.string.appointment_select_date_future, Toast.LENGTH_SHORT).show();
                                 }
-                                if(!TextUtils.isEmpty(editAddress.getText())){
+                            } else if(!TextUtils.isEmpty(editAddress.getText())){
                                     if(!addressValidates(newAddress)){
                                         Toast.makeText(AppointmentActivity.this, R.string.appointment_invalid_address, Toast.LENGTH_SHORT).show();
                                     } else {
                                         newMeeting.put("address", newAddress);
+                                        if(timeSelected){
+                                            newMeeting.put("hour", newHour);
+                                            newMeeting.put("minute", newMinute);
+                                            done = true;
+                                        } else {
+                                            done = true;
+                                        }
                                     }
-                                }
+                            } else if(timeSelected){
+                                newMeeting.put("hour", newHour);
+                                newMeeting.put("minute", newMinute);
+                                done = true;
+                            }
 
+                            if(done){
                                 ref.updateChildren(newMeeting).addOnCompleteListener(new OnCompleteListener() {
                                     @Override
                                     public void onComplete(@NonNull Task task) {
@@ -717,6 +751,9 @@ public class AppointmentActivity extends AppCompatActivity {
                                             cancelMeetingBtn.setClickable(true);
                                             confirmMeetingEndBtn.setAlpha(1f);
                                             confirmMeetingEndBtn.setClickable(true);
+                                            done = false;
+                                            dateSelected = false;
+                                            timeSelected = false;
                                         } else {
                                             Toast.makeText(AppointmentActivity.this, "failed", Toast.LENGTH_SHORT).show();
                                         }
@@ -724,10 +761,7 @@ public class AppointmentActivity extends AppCompatActivity {
                                 });
                                 int changesN = changes + 1;
                                 ref.child("changes").setValue(changesN);
-                            } else {
-                                Toast.makeText(AppointmentActivity.this, R.string.appointment_select_date_future, Toast.LENGTH_SHORT).show();
                             }
-
                         }
                     });
                     builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
