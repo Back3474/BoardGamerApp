@@ -265,7 +265,7 @@
     <string name="notification_new_rating_title">New Rating</string>
     <string name="notification_new_rating">rated the last Gamenight!</string>
     <string name="notification_changed_rating_title">Rating changed</string>
-    <string name="notification_changed_rating">changed his Rating!</string>
+    <string name="notification_changed_rating">- Rating changed!</string>
     <string name="notification_not_taking_part_title">Gamenight Participates</string>
     <string name="notification_not_taking_part">can\'t participate in the next Gamenight!</string>
     <string name="notification_late_participant_title">Late Participant</string>

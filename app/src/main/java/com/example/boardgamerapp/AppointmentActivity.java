@@ -60,7 +60,7 @@ public class AppointmentActivity extends AppCompatActivity {
     private DateTimeFormatter dtf;
     private Button editMeetingBtn, cancelMeetingBtn, confirmMeetingEndBtn, selectTimeBtn, selectDateBtn;
     private TextView nxtMeetingDay, nxtMeetingTime, nxtMeetingHost, nxtMeetingAddress, meetingLabel, meetingIsCanceled, hostLabel;
-    private Boolean meetingCanceled, clickedForEdit, done, dateSelected, timeSelected;
+    private Boolean meetingCanceled, clickedForEdit, done, dateSelected, timeSelected, newMeetingGenerated;
     private ViewSwitcher viewSwitcherDay, viewSwitcherTime, viewSwitcherAddress;
     private ImageButton confirmChanges;
     private EditText editAddress;
@@ -92,6 +92,7 @@ public class AppointmentActivity extends AppCompatActivity {
         clickedForEdit = false;
         dateSelected = false;
         timeSelected = false;
+        newMeetingGenerated = false;
         dtf = DateTimeFormatter.ofPattern((String) getText(R.string.date_format));
         today = LocalDate.now();
         viewSwitcherDay = findViewById(R.id.dayViewSwitcher);
@@ -146,6 +147,7 @@ public class AppointmentActivity extends AppCompatActivity {
                 nxtMeetingTime.setText(String.format(Locale.getDefault(), "%02d:%02d", hour, minute));
                 nxtMeetingHost.setText(snapshot.child("host").getValue().toString());
                 nxtMeetingAddress.setText(snapshot.child("address").getValue().toString());
+                meetingCanceled = snapshot.child("isCanceled").getValue(Boolean.class);
 
                 List<String> nextMeetingParticipants = new ArrayList<String>();
                 for(DataSnapshot dataSnapshot : snapshot.child("participants").getChildren()){
@@ -167,7 +169,7 @@ public class AppointmentActivity extends AppCompatActivity {
                                 refUsers.addValueEventListener(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                        ArrayList users = new ArrayList<String>();
+                                        ArrayList users = new ArrayList();
                                         for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                                             String userUid = dataSnapshot.child("id").getValue().toString();
                                             String userName = dataSnapshot.child("firstname").getValue().toString() + " " + dataSnapshot.child("lastname").getValue().toString();
@@ -177,12 +179,6 @@ public class AppointmentActivity extends AppCompatActivity {
                                             users.add(userUid);
                                         }
 
-                                        for(int i = 0; i < nextMeetingParticipants.size(); i++){
-                                            String uid = nextMeetingParticipants.get(i);
-                                            if(!users.contains(uid)){
-                                                refNextMeeting.child("participants").child(uid).removeValue();
-                                            }
-                                        }
 
                                         Collections.sort(users, String.CASE_INSENSITIVE_ORDER);
                                         int currentHostIndex = users.indexOf(auth.getUid());
@@ -196,8 +192,8 @@ public class AppointmentActivity extends AppCompatActivity {
                                         }
 
                                         int dayOfWeek = getDayOfWeek(appointmentDefDay);
-                                        nextMeetingDate = today.with(TemporalAdjusters.next(DayOfWeek.of(dayOfWeek)));
-                                        if(DAYS.between(today, nextMeetingDate) < 5){
+                                        nextMeetingDate = inputDate.with(TemporalAdjusters.next(DayOfWeek.of(dayOfWeek)));
+                                        if(DAYS.between(inputDate, nextMeetingDate) < 5){
                                             nextMeetingDate = nextMeetingDate.with(TemporalAdjusters.next(DayOfWeek.of(dayOfWeek)));
                                         }
 
@@ -298,13 +294,6 @@ public class AppointmentActivity extends AppCompatActivity {
                                                 users.add(userUid);
                                             }
 
-                                            for(int i = 0; i < nextMeetingParticipants.size(); i++){
-                                                String uid = nextMeetingParticipants.get(i);
-                                                if(!users.contains(uid)){
-                                                    refNextMeeting.child("participants").child(uid).removeValue();
-                                                }
-                                            }
-
                                             Collections.sort(users, String.CASE_INSENSITIVE_ORDER);
                                             int currentHostIndex = users.indexOf(auth.getUid());
                                             String newHost;
@@ -366,7 +355,6 @@ public class AppointmentActivity extends AppCompatActivity {
                     }
                 };
 
-                meetingCanceled = snapshot.child("isCanceled").getValue(Boolean.class);
                 if(meetingCanceled){
                     meetingIsCanceled.setText(R.string.appointment_meeting_canceled_label);
                     meetingIsCanceled.setTextColor(Color.RED);

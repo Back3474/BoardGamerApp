@@ -265,7 +265,7 @@
     <string name="notification_new_rating_title">Neue Bewertung</string>
     <string name="notification_new_rating">hat den letzten Spieleabend bewertet!</string>
     <string name="notification_changed_rating_title">Bewertung geändert</string>
-    <string name="notification_changed_rating">hat seine Bewertung geändert!</string>
+    <string name="notification_changed_rating">- Bewertung geändert!</string>
     <string name="notification_not_taking_part_title">Spieleabend Teilnehmer</string>
     <string name="notification_not_taking_part">kann am Spieleabend nicht teilnehmen!</string>
     <string name="notification_late_participant_title">Verspätung Teilnehmer</string>
