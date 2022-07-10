@@ -246,6 +246,8 @@
     <string name="main_cannot_take_part_host">You can\'t do this! Your are the Host!</string>
     <string name="main_late_host_title">Attention</string>
     <string name="main_late_host_msg">You can\'t do this! You are the Host!"\n"If you want to change the Meeting Time, please go to the Meeting Editting Screen."\n\n"Redirect to Meeting Editting Screen?</string>
+    <string name="main_edit_meeting_details_title">Edit Meeting</string>
+    <string name="main_edit_meeting_details">Do you want to make some Changes to the Meeting Details?</string>
     <string name="appointment_confrim_end_error">The End of the Meeting can only be confirmed after the Appointment!</string>
     <string name="appointment_cant_be_canceled">The Meeting can\'t be canceled within 24 hours before the Meeting Time!</string>
     <string name="rating_last_gamenight_label">Last Gamenight</string>
@@ -274,6 +276,8 @@
     <string name="notification_new_game">suggested a new Game for the next Gamenight:</string>
     <string name="notification_meeting_canceled_title">Gamenight canceled</string>
     <string name="notification_meeting_canceled">canceled the next Gamenight!</string>
+    <string name="notification_new_meeting_generated_title">New Appointment Generated</string>
+    <string name="notification_new_meeting_generated">A new Gamenight Appointment has been generated! Host:</string>
 
     <string name="mon">Monday</string>
     <string name="tue">Tuesday</string>

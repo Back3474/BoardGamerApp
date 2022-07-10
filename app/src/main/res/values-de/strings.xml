@@ -246,6 +246,8 @@
     <string name="main_cannot_take_part_host">Du kannst deine Teilnahme nicht absagen! Du bist der Gastgeber!</string>
     <string name="main_late_host_title">Achtung</string>
     <string name="main_late_host_msg">Das geht nicht! Du bist der Gastgeber!"\n"Aber du kannst Änderungen am Termin vornehmen."\n\n"Zur Terminbearbeitung weiterleiten?</string>
+    <string name="main_edit_meeting_details_title">Termin bearbeiten</string>
+    <string name="main_edit_meeting_details">Möchtest du den Spieleabend-Termin bearbeiten?</string>
     <string name="appointment_confrim_end_error">Das Ende des Spieleabends kann erst nach dem Termin bestätigt werden!</string>
     <string name="appointment_cant_be_canceled">Der Spieleabend muss mindest 24h vorher abgesagt werden!</string>
     <string name="rating_last_gamenight_label">Letzter Spieleabend</string>
@@ -274,6 +276,8 @@
     <string name="notification_new_game">hat ein neues Spiel für den nächsten Spieleabend vorgeschlagen:</string>
     <string name="notification_meeting_canceled_title">Spieleabend abgesagt</string>
     <string name="notification_meeting_canceled">hat den nächsten Spieleabend abgesagt!</string>
+    <string name="notification_new_meeting_generated_title">Neuer Termin generiert</string>
+    <string name="notification_new_meeting_generated">Ein neuer Spieleabend-Termin wurde generiert! Gastgeber/in:</string>
 
 
     <string name="mon">Montag</string>

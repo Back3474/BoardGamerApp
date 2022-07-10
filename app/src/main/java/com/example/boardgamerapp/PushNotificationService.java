@@ -15,6 +15,7 @@ import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -27,6 +28,9 @@ import com.google.firebase.messaging.RemoteMessage;
 import java.util.Locale;
 
 public class PushNotificationService extends FirebaseMessagingService {
+    FirebaseAuth auth = FirebaseAuth.getInstance();
+    String uid;
+    String uName;
 
     @Override
     public void onMessageReceived(@NonNull RemoteMessage message) {
@@ -39,9 +43,14 @@ public class PushNotificationService extends FirebaseMessagingService {
         String text = getString(getResources().getIdentifier(textRaw, "string", getPackageName()));
 
         if(message.getData().containsKey("uid")){
-            String uid = message.getData().get("uid").toString();
-            String uName = message.getData().get("uName").toString();
-            text = uName + " " + text;
+            uid = message.getData().get("uid").toString();
+            uName = message.getData().get("uName").toString();
+
+            if(msgId.toString().equals("new_meeting")){
+                text = text + " " + uName;
+            } else {
+                text = uName + " " + text;
+            }
         }
 
         if(message.getData().containsKey("latetime")){
@@ -95,6 +104,7 @@ public class PushNotificationService extends FirebaseMessagingService {
         notificationNumber++;
         editor.putInt("notificationNumber", notificationNumber);
         editor.commit();
+
     }
 
 

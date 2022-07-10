@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
     private String date, userLatetime_txt, allAdmins;
     private int hour, minute;
     private HashMap<String, Object> participants;
-    private Boolean meetingCanceled, isHost, isAdmin;
+    private Boolean meetingCanceled, isHost, isAdmin, newMeetingGenerated;
 
 
 
@@ -55,6 +55,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         setContentView(R.layout.activity_main);
 
         FirebaseMessaging firebaseMessaging = FirebaseMessaging.getInstance();
+
         firebaseMessaging.subscribeToTopic("next_meeting");
         firebaseMessaging.subscribeToTopic("rating_changed");
         firebaseMessaging.subscribeToTopic("new_rating");
@@ -90,6 +91,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         lateParticipants = findViewById(R.id.late_participants);
         userLatetime_txt = null;
         allAdmins = null;
+        newMeetingGenerated = false;
 
         lateParticipants.setVisibility(View.GONE);
         lateParticipantsLabel.setVisibility(View.GONE);
@@ -102,6 +104,10 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         DatabaseReference refParticipants = db.getReference("next meeting/participants");
         DatabaseReference refNextMeeting = db.getReference("next meeting");
         DatabaseReference refCurrentUser = db.getReference("users/"+auth.getUid());
+        DatabaseReference ref = db.getReference();
+
+        ref.child("new meeting generated").removeValue();
+
         refUser.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -201,6 +207,9 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                 if(!TextUtils.isEmpty(lateParticipants.getText())){
                     lateParticipantsLabel.setVisibility(View.VISIBLE);
                     lateParticipants.setVisibility(View.VISIBLE);
+                } else {
+                    lateParticipantsLabel.setVisibility(View.GONE);
+                    lateParticipants.setVisibility(View.GONE);
                 }
             }
 
@@ -277,8 +286,24 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         editMeetingBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(MainActivity.this, AppointmentActivity.class));
-                finish();
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setCancelable(true);
+                builder.setTitle(R.string.main_edit_meeting_details_title);
+                builder.setMessage(R.string.main_edit_meeting_details);
+                builder.setPositiveButton(R.string.discard_yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        startActivity(new Intent(MainActivity.this, AppointmentActivity.class));
+                    }
+                });
+                builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+                });
+                AlertDialog dialog = builder.create();
+                dialog.show();
             }
         });
 
@@ -336,7 +361,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                             });
                             AlertDialog dialog = builder.create();
                             dialog.show();
-                        } else if(!snapshot.hasChild(auth.getUid())){
+                        } else if(!snapshot.child(auth.getUid()).child("isTakingPart").getValue(Boolean.class)){
                             Toast.makeText(MainActivity.this, R.string.user_not_taking_part, Toast.LENGTH_SHORT).show();
                         } else if(meetingCanceled){
                             Toast.makeText(MainActivity.this, R.string.appointment_meeting_canceled_label, Toast.LENGTH_SHORT).show();
@@ -400,6 +425,8 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                                 firebaseMessaging.unsubscribeFromTopic("late_participant");
                                 firebaseMessaging.unsubscribeFromTopic("new_game");
                                 firebaseMessaging.unsubscribeFromTopic("meeting_canceled");
+
+
                                 startActivity(new Intent(MainActivity.this, LoginActivity.class));
                                 finish();
                             }
