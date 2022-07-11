@@ -45,65 +45,73 @@ public class PushNotificationService extends FirebaseMessagingService {
         if(message.getData().containsKey("uid")){
             uid = message.getData().get("uid").toString();
             uName = message.getData().get("uName").toString();
+        }
 
+        if(!uid.equals(auth.getUid().toString())){
             if(msgId.toString().equals("new_meeting")){
                 text = text + " " + uName;
             } else {
                 text = uName + " " + text;
             }
+
+            if(message.getData().containsKey("latetime")){
+                String latetime = message.getData().get("latetime").toString();
+                text = text + " " + latetime + " " + getText(R.string.late_late_participants_min);
+            }
+
+            if(message.getData().containsKey("game")){
+                String game = message.getData().get("game").toString();
+                text = text + " " + game;
+            }
+
+            final String CHANNEL_ID = "HEADS_UP_NOTIFICATION";
+            NotificationChannel channel = new NotificationChannel(
+                    CHANNEL_ID,
+                    "Heads Up Notification",
+                    NotificationManager.IMPORTANCE_HIGH
+            );
+
+            getSystemService(NotificationManager.class).createNotificationChannel(channel);
+            Notification.Builder notification = new Notification.Builder(this, CHANNEL_ID)
+                    .setContentTitle(Html.fromHtml("<b>"+title+"</b>", Html.FROM_HTML_MODE_COMPACT))
+                    .setContentText(text)
+                    .setSmallIcon(R.drawable.ic_launcher_background)
+                    .setAutoCancel(true)
+                    .setStyle(new Notification.BigTextStyle().bigText(text).setBigContentTitle(Html.fromHtml("<b>"+title+"</b>", Html.FROM_HTML_MODE_COMPACT)));
+
+            if(msgId.equals("next_meeting")){
+                Intent resultIntent = new Intent(getApplicationContext(), MainActivity.class);
+                resultIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                PendingIntent resultPendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, resultIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+                notification.setContentIntent(resultPendingIntent);
+            } else if(msgId.equals("new_meeting")){
+                Intent resultIntent = new Intent(getApplicationContext(), MainActivity.class);
+                resultIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                PendingIntent resultPendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, resultIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+                notification.setContentIntent(resultPendingIntent);
+            } else if(msgId.equals("rating")){
+                Intent resultIntent = new Intent(getApplicationContext(), RatingActivity.class);
+                resultIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                PendingIntent resultPendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, resultIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+                notification.setContentIntent(resultPendingIntent);
+            } else if(msgId.equals("games")){
+                Intent resultIntent = new Intent(getApplicationContext(), GamesActivity.class);
+                resultIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                PendingIntent resultPendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, resultIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+                notification.setContentIntent(resultPendingIntent);
+            }
+
+            SharedPreferences prefs = getSharedPreferences(Activity.class.getSimpleName(), Context.MODE_PRIVATE);
+            int notificationNumber = prefs.getInt("notificationNumber", 0);
+
+            NotificationManagerCompat.from(this).notify(notificationNumber, notification.build());
+
+            SharedPreferences.Editor editor = prefs.edit();
+            notificationNumber++;
+            editor.putInt("notificationNumber", notificationNumber);
+            editor.commit();
         }
 
-        if(message.getData().containsKey("latetime")){
-            String latetime = message.getData().get("latetime").toString();
-            text = text + " " + latetime + " " + getText(R.string.late_late_participants_min);
-        }
-
-        if(message.getData().containsKey("game")){
-            String game = message.getData().get("game").toString();
-            text = text + " " + game;
-        }
-
-        final String CHANNEL_ID = "HEADS_UP_NOTIFICATION";
-        NotificationChannel channel = new NotificationChannel(
-                CHANNEL_ID,
-                "Heads Up Notification",
-                NotificationManager.IMPORTANCE_HIGH
-        );
-
-        getSystemService(NotificationManager.class).createNotificationChannel(channel);
-        Notification.Builder notification = new Notification.Builder(this, CHANNEL_ID)
-                .setContentTitle(Html.fromHtml("<b>"+title+"</b>", Html.FROM_HTML_MODE_COMPACT))
-                .setContentText(text)
-                .setSmallIcon(R.drawable.ic_launcher_background)
-                .setAutoCancel(true)
-                .setStyle(new Notification.BigTextStyle().bigText(text).setBigContentTitle(Html.fromHtml("<b>"+title+"</b>", Html.FROM_HTML_MODE_COMPACT)));
-
-        if(msgId.equals("next_meeting")){
-            Intent resultIntent = new Intent(getApplicationContext(), MainActivity.class);
-            resultIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            PendingIntent resultPendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, resultIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-            notification.setContentIntent(resultPendingIntent);
-        } else if(msgId.equals("rating")){
-            Intent resultIntent = new Intent(getApplicationContext(), RatingActivity.class);
-            resultIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            PendingIntent resultPendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, resultIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-            notification.setContentIntent(resultPendingIntent);
-        } else if(msgId.equals("games")){
-            Intent resultIntent = new Intent(getApplicationContext(), GamesActivity.class);
-            resultIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            PendingIntent resultPendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, resultIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-            notification.setContentIntent(resultPendingIntent);
-        }
-
-        SharedPreferences prefs = getSharedPreferences(Activity.class.getSimpleName(), Context.MODE_PRIVATE);
-        int notificationNumber = prefs.getInt("notificationNumber", 0);
-
-        NotificationManagerCompat.from(this).notify(notificationNumber, notification.build());
-
-        SharedPreferences.Editor editor = prefs.edit();
-        notificationNumber++;
-        editor.putInt("notificationNumber", notificationNumber);
-        editor.commit();
 
     }
 

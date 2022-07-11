@@ -178,7 +178,6 @@ public class AppointmentActivity extends AppCompatActivity {
                             nextMeetingDate = nextMeetingDate.with(TemporalAdjusters.next(DayOfWeek.of(dayOfWeek)));
                         }
 
-
                         refUsers.child(newHost).child("isHost").setValue(true);
 
                         refNextMeeting.child("hostId").setValue(newHostId);
@@ -195,6 +194,8 @@ public class AppointmentActivity extends AppCompatActivity {
                         refNextMeeting.child("date").setValue(nextMeetingDate.toString());
 
                         refNextMeeting.child("changes").setValue(0);
+
+                        refNextMeeting.getParent().child("notification").removeValue();
 
                         refUsers.child(auth.getUid()).child("isHost").setValue(false).addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
@@ -271,7 +272,6 @@ public class AppointmentActivity extends AppCompatActivity {
                                 nextMeetingDate = nextMeetingDate.with(TemporalAdjusters.next(DayOfWeek.of(dayOfWeek)));
                             }
 
-
                             refUsers.child(newHost).child("isHost").setValue(true);
 
                             refNextMeeting.child("hostId").setValue(newHostId);
@@ -289,6 +289,7 @@ public class AppointmentActivity extends AppCompatActivity {
 
                             refNextMeeting.child("changes").setValue(0);
 
+                            refNextMeeting.getParent().child("notification").removeValue();
 
                             refUsers.child(auth.getUid()).child("isHost").setValue(false).addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
@@ -431,6 +432,7 @@ public class AppointmentActivity extends AppCompatActivity {
                             Toast.makeText(AppointmentActivity.this, R.string.appointment_cant_be_canceled, Toast.LENGTH_SHORT).show();
                         } else {
                             if(!meetingCanceled){
+                                refNextMeeting.getParent().child("notification").child("isCanceled").setValue(true);
                                 refNextMeeting.child("isCanceled").setValue(true).addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override
                                     public void onComplete(@NonNull Task<Void> task) {
@@ -648,11 +650,15 @@ public class AppointmentActivity extends AppCompatActivity {
 
     private void confrimAllChanges() {
         changes = 0;
-        DatabaseReference refChanges = db.getReference("next meeting/changes");
-        refChanges.addListenerForSingleValueEvent(new ValueEventListener() {
+        DatabaseReference refNotification = db.getReference("notification");
+
+        refNotification.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                changes = snapshot.getValue(Integer.class);
+                if(snapshot.hasChild("changes")){
+                    changes = snapshot.child("changes").getValue(Integer.class);
+                }
+
             }
 
             @Override
@@ -660,6 +666,7 @@ public class AppointmentActivity extends AppCompatActivity {
 
             }
         });
+
         confirmChanges.setAlpha(1.0f);
         if(!confirmChanges.hasOnClickListeners()){
             confirmChanges.setOnClickListener(new View.OnClickListener() {
@@ -788,7 +795,7 @@ public class AppointmentActivity extends AppCompatActivity {
                                     }
                                 });
                                 int changesN = changes + 1;
-                                ref.child("changes").setValue(changesN);
+                                refNotification.child("changes").setValue(changesN);
                             }
                         }
                     });
