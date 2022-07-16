@@ -372,6 +372,7 @@ public class AppointmentActivity extends AppCompatActivity {
 
                     users.add(userUid);
 
+
                     Collections.sort(users, String.CASE_INSENSITIVE_ORDER);
                     int currentHostIndex = users.indexOf(auth.getUid());
                     if (currentHostIndex + 1 == users.size()) {

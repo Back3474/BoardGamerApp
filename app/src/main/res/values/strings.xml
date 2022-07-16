@@ -189,6 +189,7 @@
     <string name="games_no_more_votes">Voting ended! \nGames have been chosen!</string>
     <string name="games_no_more_votes_no_games">Voting ended! \nNo Game suggested!</string>
     <string name="games_meeting_canceled">Meeting has been canceled!</string>
+    <string name="games_max_games">No More Suggestions! Maximum reached!</string>
     <string name="late_time_already_set_5_min">Your Latetime is already set to 5 Minutes!</string>
     <string name="late_time_set_to_5_min">Your Latetime has been set to 5 Minutes!</string>
     <string name="late_time_changed_to_5_min">Your Latetime has been changed to 5 Minutes!</string>

@@ -47,6 +47,7 @@ public class PushNotificationService extends FirebaseMessagingService {
             uName = message.getData().get("uName").toString();
         }
 
+
         if(!uid.equals(auth.getUid().toString())){
             if(msgId.toString().equals("new_meeting")){
                 text = text + " " + uName;
@@ -110,6 +111,7 @@ public class PushNotificationService extends FirebaseMessagingService {
             notificationNumber++;
             editor.putInt("notificationNumber", notificationNumber);
             editor.commit();
+
         }
 
 

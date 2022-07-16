@@ -189,6 +189,7 @@
     <string name="games_no_more_votes">Abstimmung beendet! \nDie Spiele wurden gewählt!</string>
     <string name="games_no_more_votes_no_games">Abstimmung beendet! \nKein Spiel vorgeschlagen!</string>
     <string name="games_meeting_canceled">Spieleabend abgesagt!</string>
+    <string name="games_max_games">Keine weiteren Vorschläge! Maximum erreicht!</string>
     <string name="late_time_already_set_5_min">Deine Verspätung beträgt bereits 5 Minuten!</string>
     <string name="late_time_set_to_5_min">Deine Verspätung wurde auf 5 Minuten gesetzt!</string>
     <string name="late_time_changed_to_5_min">Deine Verspätung wurde auf 5 Minuten geändert!</string>

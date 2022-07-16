@@ -378,6 +378,7 @@ public class GamesActivity extends AppCompatActivity {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         userSuggestedGames = 0;
+                        float gamesCount = snapshot.getChildrenCount();
                             for (DataSnapshot dataSnapshot : snapshot.getChildren()){
                                 if(dataSnapshot.child("recommender").getValue().equals(auth.getUid())){
                                     userSuggestedGames = userSuggestedGames + 1;
@@ -385,7 +386,9 @@ public class GamesActivity extends AppCompatActivity {
                             }
                         if(TextUtils.isEmpty(suggestedGame.getText())){
                             Toast.makeText(GamesActivity.this, R.string.games_suggest_game_txt, Toast.LENGTH_SHORT).show();
-                        } else if(userSuggestedGames > 1){
+                        } else if(gamesCount >= 10){
+                            Toast.makeText(GamesActivity.this, R.string.games_max_games, Toast.LENGTH_SHORT).show();
+                        }else if(userSuggestedGames > 1){
                             Toast.makeText(GamesActivity.this, R.string.games_suggested_2x_already, Toast.LENGTH_SHORT).show();
                         } else {
                             AlertDialog.Builder builder = new AlertDialog.Builder(GamesActivity.this);

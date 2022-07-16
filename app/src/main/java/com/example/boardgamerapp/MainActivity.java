@@ -152,6 +152,9 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                 if(meetingCanceled){
                     notTakingPart.setText(R.string.appointment_meeting_canceled_label);
                     notTakingPart.setTextColor(Color.RED);
+                } else if(!snapshot.child("participants").hasChild(auth.getUid())){
+                    notTakingPart.setText(R.string.user_not_taking_part);
+                    notTakingPart.setTextColor(Color.RED);
                 } else if(!snapshot.child("participants").child(auth.getUid()).child("isTakingPart").getValue(Boolean.class)){
                     notTakingPart.setText(R.string.user_not_taking_part);
                     notTakingPart.setTextColor(Color.RED);
@@ -224,11 +227,11 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 greetText.setText(getText(R.string.greetText) +" "+ snapshot.child("firstname").getValue().toString()+"!");
                 isHost = snapshot.child("isHost").getValue(Boolean.class);
-                isAdmin = snapshot.child("isAdmin").getValue(Boolean.class);
 
-                if(isHost == false){
+                if(!isHost){
                     editMeetingBtn.setVisibility(View.GONE);
                 }
+
                 if(snapshot.child("status").getValue().toString().equals("deactivated")){
                     startActivity(new Intent(MainActivity.this, LoginActivity.class));
                 }
@@ -240,6 +243,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
             }
         });
 
+
         cannotTakePartBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -248,7 +252,9 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         if(isHost){
                             Toast.makeText(MainActivity.this, R.string.main_cannot_take_part_host, Toast.LENGTH_SHORT).show();
-                        }else if(!snapshot.child(auth.getUid()).child("isTakingPart").getValue(Boolean.class)){
+                        } else if(!snapshot.hasChild(auth.getUid())){
+                            Toast.makeText(MainActivity.this, R.string.user_not_taking_part_already, Toast.LENGTH_SHORT).show();
+                        } else if(!snapshot.child(auth.getUid()).child("isTakingPart").getValue(Boolean.class)){
                             Toast.makeText(MainActivity.this, R.string.user_not_taking_part_already, Toast.LENGTH_SHORT).show();
                         } else if(meetingCanceled){
                             Toast.makeText(MainActivity.this, R.string.appointment_meeting_canceled_label, Toast.LENGTH_SHORT).show();
@@ -361,6 +367,8 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                             });
                             AlertDialog dialog = builder.create();
                             dialog.show();
+                        } else if(!snapshot.hasChild(auth.getUid())){
+                            Toast.makeText(MainActivity.this, R.string.user_not_taking_part, Toast.LENGTH_SHORT).show();
                         } else if(!snapshot.child(auth.getUid()).child("isTakingPart").getValue(Boolean.class)){
                             Toast.makeText(MainActivity.this, R.string.user_not_taking_part, Toast.LENGTH_SHORT).show();
                         } else if(meetingCanceled){

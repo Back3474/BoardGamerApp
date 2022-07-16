@@ -128,7 +128,7 @@ public class RegistrationActivity extends AppCompatActivity {
                     user.put("lastname", ln);
                     user.put("address", adr);
                     user.put("email", email);
-                    user.put("status", "regular");
+                    user.put("status", "active");
                     user.put("id", auth.getUid().toString());
                     user.put("isAdmin", false);
                     user.put("isHost", false);

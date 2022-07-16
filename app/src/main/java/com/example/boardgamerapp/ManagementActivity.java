@@ -168,7 +168,8 @@ public class ManagementActivity extends AppCompatActivity {
                     userUid = dataSnapshot.child("id").getValue().toString();
                     userName = dataSnapshot.child("firstname").getValue().toString() + " " + dataSnapshot.child("lastname").getValue().toString();
                     String userStatus = dataSnapshot.child("status").getValue().toString();
-                    if(userStatus.equals("active")) {
+                    Boolean admin = dataSnapshot.child("isAdmin").getValue(Boolean.class);
+                    if(userStatus.equals("active") && !admin) {
                         userList.add(new User(userUid, userName));
                     }
                 }
